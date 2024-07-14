@@ -4240,7 +4240,7 @@ class RiteOfResurrection(_TalentEquipmentSkillCard):
     - Tested, second equipment doesn't refresh rivial limit per game.
     - Tested, revival of Qiqi resets revival chances per game.
     """
-    _DICE_COST = AbstractDice({Element.CRYO: 5})
+    _DICE_COST = AbstractDice({Element.CRYO: 4})
     _CHARACTER = chr.Qiqi
     _EQUIPMENT_STATUS = stt.RiteOfResurrectionStatus
     _SKILL = CharacterSkill.ELEMENTAL_BURST

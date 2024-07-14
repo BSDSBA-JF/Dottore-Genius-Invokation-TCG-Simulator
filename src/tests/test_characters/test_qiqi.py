@@ -61,29 +61,34 @@ class TestQiqi(unittest.TestCase):
     def test_herald_of_frost_summon(self):
         game_state = AddSummonEffect(Pid.P1, HeraldOfFrostSummon).execute(self.BASE_GAME)
         game_state = replace_character(game_state, Pid.P1, ElectroHypostasis, char_id=3)
-        game_state = simulate_status_dmg(game_state, dmg_amount=1, pid=Pid.P1, char_id=1)
-        game_state = simulate_status_dmg(game_state, dmg_amount=1, pid=Pid.P1, char_id=2)
+        game_state = simulate_status_dmg(game_state, dmg_amount=3, pid=Pid.P1, char_id=1)
+        game_state = simulate_status_dmg(game_state, dmg_amount=3, pid=Pid.P1, char_id=2)
         game_state = grant_all_thick_shield(game_state)
 
         # test heals in activity order (and heals based on lost hp instead of max_hp)
         game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
         game_state = step_action(game_state, Pid.P2, EndRoundAction())
         p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
+        self.assertEqual(p1c1.hp, 7)
+        self.assertEqual(p1c2.hp, 9)
+        self.assertEqual(p1c3.hp, 8)
+
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
+        p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
+        self.assertEqual(p1c1.hp, 8)
+        self.assertEqual(p1c2.hp, 9)
+        self.assertEqual(p1c3.hp, 8)
+
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
+        p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
         self.assertEqual(p1c1.hp, 9)
-        self.assertEqual(p1c2.hp, 10)
+        self.assertEqual(p1c2.hp, 9)
         self.assertEqual(p1c3.hp, 8)
 
-        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
-        p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
-        self.assertEqual(p1c1.hp, 10)
-        self.assertEqual(p1c2.hp, 10)
-        self.assertEqual(p1c3.hp, 8)
-
-        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
-        p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
-        self.assertEqual(p1c1.hp, 10)
-        self.assertEqual(p1c2.hp, 10)
-        self.assertEqual(p1c3.hp, 8)
+        game_state = heal_for_all(game_state)
+        game_state = next_round_with_great_omni(game_state)
+        game_state = end_round(game_state, Pid.P2)
+        assert game_state.player1.summons.just_find(HeraldOfFrostSummon).usages == 2
 
         game_state = simulate_status_dmg(game_state, dmg_amount=2, pid=Pid.P1, char_id=1)
         game_state = simulate_status_dmg(game_state, dmg_amount=2, pid=Pid.P1, char_id=2)
@@ -91,7 +96,7 @@ class TestQiqi(unittest.TestCase):
         game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
         p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
         self.assertEqual(p1c1.hp, 8)
-        self.assertEqual(p1c2.hp, 8)
+        self.assertEqual(p1c2.hp, 9)
         self.assertEqual(p1c3.hp, 6)
 
         # test summon deals damage
@@ -102,7 +107,7 @@ class TestQiqi(unittest.TestCase):
         self.assertEqual(p2ac.hp, 9)
         self.assertIn(Element.CRYO, p2ac.elemental_aura)
         self.assertIn(HeraldOfFrostSummon, p1_summons)
-        self.assertEqual(p1_summons.just_find(HeraldOfFrostSummon).usages, 2)
+        self.assertEqual(p1_summons.just_find(HeraldOfFrostSummon).usages, 1)
 
         # non Qiqi character's normal attack doesn't trigger
         game_state = skip_action_round_until(game_state, Pid.P1)
@@ -111,7 +116,7 @@ class TestQiqi(unittest.TestCase):
         game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
         p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
         self.assertEqual(p1c1.hp, 8)
-        self.assertEqual(p1c2.hp, 8)
+        self.assertEqual(p1c2.hp, 9)
         self.assertEqual(p1c3.hp, 6)
 
     def test_fortune_preserving_talisman_status(self):
@@ -172,7 +177,7 @@ class TestQiqi(unittest.TestCase):
         game_state = recharge_energy_for_all(game_state)
         game_state = step_action(game_state, Pid.P1, CardAction(
             card=RiteOfResurrection,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.CRYO: 5}))
+            instruction=DiceOnlyInstruction(dice=ActualDice({Element.CRYO: 4}))
         ))
         game_state = step_action(game_state, Pid.P2, EndRoundAction())
         p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
@@ -215,7 +220,7 @@ class TestQiqi(unittest.TestCase):
         game_state = recharge_energy_for_all(game_state)
         game_state = step_action(game_state, Pid.P1, CardAction(
             card=RiteOfResurrection,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.CRYO: 5}))
+            instruction=DiceOnlyInstruction(dice=ActualDice({Element.CRYO: 4}))
         ))
         p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
         self.assertTrue(p1c1.is_defeated())
@@ -266,7 +271,7 @@ class TestQiqi(unittest.TestCase):
         game_state = recharge_energy_for_all(game_state)
         game_state = step_action(game_state, Pid.P1, CardAction(
             card=RiteOfResurrection,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.CRYO: 5}))
+            instruction=DiceOnlyInstruction(dice=ActualDice({Element.CRYO: 4}))
         ))
         p1c1, p1c2, p1c3 = game_state.player1.characters.get_characters()
         self.assertTrue(p1c1.is_alive())

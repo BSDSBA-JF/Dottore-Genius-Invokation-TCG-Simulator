@@ -784,6 +784,7 @@ class HilichurlBerserkerSummon(_DestroyOnNumSummon):
 class HeraldOfFrostSummon(_DmgPerRoundSummon):
     usages: int = 3
     activated: bool = False
+    one_time_healing_available: bool = True
     MAX_USAGES: ClassVar[int] = 3
     DMG: ClassVar[int] = 1
     ELEMENT: ClassVar[Element] = Element.CRYO
@@ -792,6 +793,7 @@ class HeraldOfFrostSummon(_DmgPerRoundSummon):
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
         *_DmgPerRoundSummon.REACTABLE_SIGNALS,
         TriggeringSignal.POST_SKILL,
+        TriggeringSignal.ROUND_END,
     ))
 
     @override
@@ -828,14 +830,34 @@ class HeraldOfFrostSummon(_DmgPerRoundSummon):
                 for char in self_alive_chars
                 if char.hp_lost() == most_damage
             )
-            return [
+            recoveries: list[eft.Effect] = [
                 eft.RecoverHPEffect(
                     source=StaticTarget.from_summon(source.pid, type(self)),
                     target=StaticTarget.from_char_id(source.pid, char_to_heal.id),
                     recovery=self.HEAL_AMOUNT,
+                ),
+            ]
+            if self.one_time_healing_available:
+                # TODO: check if triggering avoids over-healing
+                # TODO: here we assume the most damaged character is determined before
+                #       active healing
+                recoveries.append(
+                    eft.RecoverHPEffect(
+                        source=StaticTarget.from_summon(source.pid, type(self)),
+                        target=StaticTarget.from_player_active(game_state, source.pid),
+                        recovery=self.HEAL_AMOUNT,
+                    ),
                 )
-            ], replace(self, usages=0, activated=False)
+            return recoveries, replace(
+                self, usages=0, activated=False, one_time_healing_available=False,
+            )
+        elif signal is TriggeringSignal.ROUND_END and not self.one_time_healing_available:
+            return [], replace(self, usages=0, one_time_healing_available=True)
         return super()._react_to_signal(game_state, source, signal, detail)
+
+    @override
+    def content_repr(self) -> str:
+        return f"{self.usages}{' | *' if self.one_time_healing_available else ''}"
 
 
 @dataclass(frozen=True, kw_only=True)
