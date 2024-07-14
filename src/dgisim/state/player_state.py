@@ -513,6 +513,11 @@ class PlayerStateFactory:
     def f_deck_cards(self, f: Callable[[Cards], Cards]) -> PlayerStateFactory:
         return self.deck_cards(f(self._deck_cards))
 
+    def both_deck_cards(self, cards: Cards) -> PlayerStateFactory:
+        init_deck = self._initial_deck.to_mutable()
+        init_deck.cards = cards.to_dict()
+        return self.deck_cards(cards).initial_deck(init_deck)
+
     def publicly_used_cards(self, cards: Cards) -> PlayerStateFactory:
         self._publicly_used_cards = cards
         return self

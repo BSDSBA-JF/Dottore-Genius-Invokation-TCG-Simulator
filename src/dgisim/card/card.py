@@ -1583,6 +1583,9 @@ class LocationCard(SupportCard):
 
 
 class ArcaneLegendCard(Card):
+    """
+    All subclasses should return starting with super().effects(...)
+    """
     @override
     @classmethod
     def valid_in_deck(cls, deck: Deck) -> bool:
@@ -2445,17 +2448,35 @@ class InEveryHouseAStove(EventCard, _DiceOnlyChoiceProvider, ArcaneLegendCard):
             pid: Pid,
             instruction: act.Instruction,
     ) -> tuple[eft.Effect, ...]:
-        cards_drawn = min(max(0, game_state.round - 1), 4)
-        return super().effects(
-            game_state,
-            pid,
-            instruction,
-        ) + (
-            eft.DrawRandomCardEffect(
-                pid=pid,
-                num=cards_drawn,
-            ),
-        )
+        draw_talent_condition = game_state.round == 1 and 2 <= len([
+            card
+            for card, num in game_state.get_player(pid).initial_deck.cards.items()
+            if issubclass(card, TalentCard) and num > 0
+        ])
+        if draw_talent_condition:
+            return super().effects(
+                game_state,
+                pid,
+                instruction,
+            ) + (
+                eft.DrawRandomCardOfTypeEffect(
+                    pid=pid,
+                    num=1,
+                    card_type=TalentCard,
+                ),
+            )
+        else:
+            cards_drawn = min(max(0, game_state.round - 1), 4)
+            return super().effects(
+                game_state,
+                pid,
+                instruction,
+            ) + (
+                eft.DrawRandomCardEffect(
+                    pid=pid,
+                    num=cards_drawn,
+                ),
+            )
 
 
 class JoyousCelebration(EventCard, _DiceOnlyChoiceProvider, ArcaneLegendCard):

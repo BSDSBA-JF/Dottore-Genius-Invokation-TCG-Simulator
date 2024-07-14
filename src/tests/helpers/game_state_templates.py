@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from src.dgisim.card.card import *
+from src.dgisim.card.cards import Cards
 from src.dgisim.character.character import *
 from src.dgisim.character.characters import Characters
 from src.dgisim.dice import *
@@ -13,6 +15,25 @@ from src.dgisim.state.game_state import GameState
 
 class _TestMode(DefaultMode):
     _DICE_LIMIT = 1 << 100
+
+
+__SAMPLE_CARDS = Cards({
+    StreamingSurge: 2,
+    ColdBloodedStrike: 2,
+    ThunderingPenance: 2,
+    Paimon: 2,
+    Liben: 2,
+    ChangTheNinth: 2,
+    LiyueHarborWharf: 2,
+    TheBestestTravelCompanion: 2,
+    RavenBow: 2,
+    MagicGuide: 2,
+    WhiteIronGreatsword: 2,
+    WhiteTassel: 2,
+    TravelersHandySword: 2,
+    GamblersEarrings: 2,
+    TenacityOfTheMillelith: 2,
+})
 
 
 BASE_GAME = GameState.from_default().factory().mode(
@@ -35,6 +56,8 @@ BASE_GAME = GameState.from_default().factory().mode(
             Element.CRYO: BIG_INT,
             Element.GEO: BIG_INT,
         })
+    ).both_deck_cards(
+        __SAMPLE_CARDS
     ).build()
 ).f_player2(
     lambda p: p.factory().characters(
@@ -54,6 +77,8 @@ BASE_GAME = GameState.from_default().factory().mode(
             Element.CRYO: BIG_INT,
             Element.GEO: BIG_INT,
         })
+    ).both_deck_cards(
+        __SAMPLE_CARDS
     ).build()
 ).build()
 
