@@ -4360,7 +4360,7 @@ class TurnControl(_TalentEquipmentSkillCard):
 #### Yoimiya ####
 
 class NaganoharaMeteorSwarm(_TalentEquipmentSkillCard):
-    _DICE_COST = AbstractDice({Element.PYRO: 2})
+    _DICE_COST = AbstractDice({Element.PYRO: 1})
     _CHARACTER = chr.Yoimiya
     _EQUIPMENT_STATUS = stt.NaganoharaMeteorSwarmStatus
     _SKILL = CharacterSkill.SKILL2

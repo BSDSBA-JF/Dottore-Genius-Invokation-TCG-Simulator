@@ -37,7 +37,7 @@ class TestYoimiya(unittest.TestCase):
         self.assertEqual(p2ac.hp, 10)
         self.assertFalse(p2ac.elemental_aura.has_aura())
         self.assertIn(NiwabiEnshouStatus, p1ac.character_statuses)
-        self.assertEqual(p1ac.character_statuses.just_find(NiwabiEnshouStatus).usages, 2)
+        self.assertEqual(p1ac.character_statuses.just_find(NiwabiEnshouStatus).usages, 3)
         self.assertEqual(p1ac.energy, 0)
 
     def test_elemental_burst(self):
@@ -61,6 +61,7 @@ class TestYoimiya(unittest.TestCase):
         game_state = AddCharacterStatusEffect(
             StaticTarget.from_char_id(Pid.P1, 2), NiwabiEnshouStatus
         ).execute(self.BASE_GAME)
+        game_state = grant_all_infinite_revival(game_state)
         game_state = step_skill(
             game_state,
             Pid.P1,
@@ -72,7 +73,11 @@ class TestYoimiya(unittest.TestCase):
         self.assertEqual(p2ac.hp, 7)
         self.assertIn(Element.PYRO, p2ac.elemental_aura)
         self.assertIn(NiwabiEnshouStatus, p1ac.character_statuses)
-        self.assertEqual(p1ac.character_statuses.just_find(NiwabiEnshouStatus).usages, 1)
+        self.assertEqual(p1ac.character_statuses.just_find(NiwabiEnshouStatus).usages, 2)
+
+        game_state = skip_action_round_until(game_state, Pid.P1)
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
+        assert p1_active_char(game_state).character_statuses.just_find(NiwabiEnshouStatus).usages == 1
 
         # test status disappears on end of usages
         game_state = skip_action_round(game_state, Pid.P2)
@@ -132,7 +137,7 @@ class TestYoimiya(unittest.TestCase):
     def test_talent_card(self):
         game_state = step_action(self.BASE_GAME, Pid.P1, CardAction(
             card=NaganoharaMeteorSwarm,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.PYRO: 2}))
+            instruction=DiceOnlyInstruction(dice=ActualDice({Element.PYRO: 1}))
         ))
         p1ac = game_state.player1.just_get_active_character()
         p2ac = game_state.player2.just_get_active_character()

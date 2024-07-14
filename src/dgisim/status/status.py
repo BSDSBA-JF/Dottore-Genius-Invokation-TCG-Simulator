@@ -7144,8 +7144,8 @@ class NaganoharaMeteorSwarmStatus(TalentEquipmentStatus):
 
 @dataclass(frozen=True, kw_only=True)
 class NiwabiEnshouStatus(CharacterStatus, _UsageStatus):
-    usages: int = 2
-    MAX_USAGES: ClassVar[int] = 2
+    usages: int = 3
+    MAX_USAGES: ClassVar[int] = 3
     activated: bool = False
     DAMAGE_BOOST: ClassVar[int] = 1
     INFUSION_ELEMENT: ClassVar[Element] = Element.PYRO

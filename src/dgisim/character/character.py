@@ -4628,20 +4628,12 @@ class Yoimiya(Character):
 
     @override
     def _skill2(self, game_state: GameState, source: StaticTarget) -> tuple[eft.Effect, ...]:
-        if self.talent_equipped():
-            return (
-                eft.UpdateCharacterStatusEffect(
-                    target=source,
-                    status=stt.NiwabiEnshouStatus(usages=3),
-                ),
-            )
-        else:
-            return (
-                eft.AddCharacterStatusEffect(
-                    target=source,
-                    status=stt.NiwabiEnshouStatus,
-                ),
-            )
+        return (
+            eft.AddCharacterStatusEffect(
+                target=source,
+                status=stt.NiwabiEnshouStatus,
+            ),
+        )
 
     @override
     def _elemental_burst(self, game_state: GameState, source: StaticTarget) -> tuple[eft.Effect, ...]:
