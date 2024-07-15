@@ -31,7 +31,7 @@ from ..dice import AbstractDice, ActualDice
 from ..effect.enums import Zone, DynamicCharacterTarget
 from ..effect.structs import StaticTarget, DamageType
 from ..element import AURA_ELEMENTS, Element, PURE_ELEMENTS
-from ..event import CardPEvent
+from ..event import CardPEvent, PreprocessableEvent
 from ..helper.quality_of_life import BIG_INT
 from ..state.enums import Pid
 from ..status.enums import Preprocessables
@@ -348,16 +348,18 @@ class Card:
 
         The returned abstract_dice are the actual cost of using the card at the provided game_state.
         """
-        game_state, card_event = StatusProcessing.preprocess_by_all_statuses(
-            game_state=game_state,
+        card_event: CardPEvent | PreprocessableEvent = CardPEvent(
             pid=pid,
-            pp_type=Preprocessables.CARD1,
-            item=CardPEvent(
-                pid=pid,
-                card_type=cls,
-                dice_cost=cls._DICE_COST,
-            ),
+            card_type=cls,
+            dice_cost=cls._DICE_COST,
         )
+        for pp_type in Preprocessables.card_order:
+            game_state, card_event = StatusProcessing.preprocess_by_all_statuses(
+                game_state=game_state,
+                pid=pid,
+                pp_type=pp_type,
+                item=card_event,
+            )
         assert isinstance(card_event, CardPEvent)
         game_state, card_event = StatusProcessing.preprocess_by_all_statuses(
             game_state=game_state,
@@ -381,16 +383,18 @@ class Card:
 
         The returned CardPEvent is the preprocessed card event.
         """
-        game_state, card_event = StatusProcessing.preprocess_by_all_statuses(
-            game_state=game_state,
+        card_event: CardPEvent | PreprocessableEvent = CardPEvent(
             pid=pid,
-            pp_type=Preprocessables.CARD1,
-            item=CardPEvent(
-                pid=pid,
-                card_type=cls,
-                dice_cost=cls._DICE_COST,
-            ),
+            card_type=cls,
+            dice_cost=cls._DICE_COST,
         )
+        for pp_type in Preprocessables.card_order:
+            game_state, card_event = StatusProcessing.preprocess_by_all_statuses(
+                game_state=game_state,
+                pid=pid,
+                pp_type=pp_type,
+                item=card_event,
+            )
         assert isinstance(card_event, CardPEvent)
         game_state, card_event = StatusProcessing.preprocess_by_all_statuses(
             game_state=game_state,

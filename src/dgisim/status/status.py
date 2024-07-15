@@ -1110,7 +1110,7 @@ class _SkillCostReductionStatus(Status):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_OMNI:
             assert isinstance(item, ActionPEvent)
             if (
                     item.source == status_source
@@ -1894,7 +1894,7 @@ class _ElementalDiscountStatus(ArtifactEquipmentStatus):
         If this "status_source" casts a skill or talent card is played on "status_source",
         the elemental cost of the card is reduced by 1.
         """
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_ELEM:
             assert isinstance(item, CardPEvent)
             from ..card.card import TalentCard
             if (
@@ -1907,7 +1907,7 @@ class _ElementalDiscountStatus(ArtifactEquipmentStatus):
             ):
                 new_cost = item.dice_cost.cost_less_elem(1, self._ELEMENT)
                 return item.with_new_cost(new_cost), replace(self, available=False)
-        elif signal is Preprocessables.SKILL:
+        elif signal is Preprocessables.SKILL_COST_ELEM:
             assert isinstance(item, ActionPEvent)
             if (
                     item.source == status_source
@@ -2485,7 +2485,7 @@ class AncientCourtyardStatus(CombatStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import WeaponEquipmentCard, ArtifactEquipmentCard
             if (
@@ -2554,13 +2554,12 @@ class ChangingShiftsStatus(CombatStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SWAP:
+        if signal is Preprocessables.SWAP_COST_OMNI:
             assert isinstance(item, ActionPEvent) and item.event_type is EventType.SWAP
             if item.source.pid is status_source.pid \
                     and item.dice_cost.num_dice() >= self.COST_DEDUCTION:
-                assert item.dice_cost.num_dice() == item.dice_cost[Element.ANY]
-                new_cost = (item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
-                return replace(item, dice_cost=new_cost), None
+                new_cost = item.dice_cost.cost_less_elem(self.COST_DEDUCTION)
+                return item.with_new_cost(new_cost), None
         return super()._preprocess(game_state, status_source, item, signal)
 
 
@@ -2831,7 +2830,7 @@ class LyresongStatus(CombatStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import ArtifactEquipmentCard
             if (
@@ -2975,7 +2974,7 @@ class SandAndDreamsStatus(CombatStatus):
             self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_OMNI:
             assert isinstance(item, ActionPEvent)
             if (
                     status_source.pid is item.source.pid
@@ -3026,7 +3025,7 @@ class SunyataFlowerStatus(CombatStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import SupportCard
             if (
@@ -3149,13 +3148,10 @@ class WhereIsTheUnseenRazorStatus(CombatStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import WeaponEquipmentCard
             if (
@@ -3426,16 +3422,17 @@ class MintyMeatRollsStatus(CharacterStatus, _UsageStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_ANY:
             assert isinstance(item, ActionPEvent)
-            if status_source == item.source \
-                    and item.event_sub_type is CharacterSkillType.NORMAL_ATTACK \
-                    and item.dice_cost[Element.ANY] >= self.COST_DEDUCTION:
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
+            if (
+                    status_source == item.source
+                    and item.event_sub_type is CharacterSkillType.NORMAL_ATTACK
+                    and item.dice_cost.can_cost_less_any()
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_any(self.COST_DEDUCTION)),
+                    replace(self, usages=self.usages - 1),
                 )
-                return item, replace(self, usages=self.usages - 1)
         return super()._preprocess(game_state, status_source, item, signal)
 
     @override
@@ -3496,22 +3493,17 @@ class NorthernSmokedChickenStatus(CharacterStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_ANY:
             assert isinstance(item, ActionPEvent)
-            if status_source == item.source \
-                    and item.event_sub_type is CharacterSkillType.NORMAL_ATTACK \
-                    and item.dice_cost[Element.ANY] >= self.COST_DEDUCTION:
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
-                )
-                return item, None
+            if (
+                    status_source == item.source
+                    and item.event_sub_type is CharacterSkillType.NORMAL_ATTACK
+                    and item.dice_cost.can_cost_less_any()
+            ):
+                return item.with_new_cost(item.dice_cost.cost_less_any(self.COST_DEDUCTION)), None
         return super()._preprocess(game_state, status_source, item, signal)
 
     @override
@@ -3733,10 +3725,7 @@ class SuperlativeSuperstrengthStatus(CharacterStatus, _UsageStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.DMG_AMOUNT_PLUS:
@@ -3755,7 +3744,7 @@ class SuperlativeSuperstrengthStatus(CharacterStatus, _UsageStatus):
                 new_item = DmgPEvent(dmg=replace(dmg, damage=dmg.damage + dmg_boost))
                 new_self = replace(self, usages=self.usages - 1)
                 return new_item, new_self
-        elif signal is Preprocessables.SKILL:
+        elif signal is Preprocessables.SKILL_COST_ANY:
             assert isinstance(item, ActionPEvent)
             player = game_state.get_player(status_source.pid)
             if (
@@ -3763,13 +3752,9 @@ class SuperlativeSuperstrengthStatus(CharacterStatus, _UsageStatus):
                     and status_source == item.source
                     and item.event_type is EventType.SKILL1
                     and player.dice.is_even()
-                    and item.dice_cost[Element.ANY] > 0
+                    and item.dice_cost.can_cost_less_any()
             ):
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
-                )
-                return item, self
+                return item.with_new_cost(item.dice_cost.cost_less_any(self.COST_DEDUCTION)), self
         return item, self
 
 
@@ -5016,7 +5001,7 @@ class KantenSenmyouBlessingStatus(TalentEquipmentStatus, _UsageStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SWAP:
+        if signal is Preprocessables.SWAP_COST_OMNI:
             assert isinstance(item, ActionPEvent)
             if (
                     item.target == status_source
@@ -5096,10 +5081,7 @@ class ExplosiveSparkStatus(CharacterStatus, _UsageStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.DMG_AMOUNT_PLUS:
@@ -5111,29 +5093,18 @@ class ExplosiveSparkStatus(CharacterStatus, _UsageStatus):
                 new_item = DmgPEvent(dmg=replace(dmg, damage=dmg.damage + self.DAMAGE_BOOST))
                 new_self = replace(self, usages=self.usages - 1)
                 return new_item, new_self
-        elif signal is Preprocessables.SKILL:
+        elif signal is Preprocessables.SKILL_COST_ELEM:
             assert isinstance(item, ActionPEvent)
             player = game_state.get_player(status_source.pid)
             if (
                     status_source == item.source
                     and item.event_type is EventType.SKILL1
                     and player.dice.is_even()
-                    and item.dice_cost[Element.ANY] + item.dice_cost[Element.PYRO] > 0
+                    and item.dice_cost.can_cost_less_elem(Element.PYRO)
             ):
-                elems = [Element.PYRO, Element.ANY]
-                cost_deduction_left = self.COST_DEDUCTION
-                deduction: dict[Element, int] = {}
-                for elem in elems:
-                    deduction[elem] = cost_deduction_left
-                    cost_deduction_left -= item.dice_cost[elem]
-                    if cost_deduction_left <= 0:
-                        break
-                if item.dice_cost[Element.PYRO] > 0:
-                    item = replace(
-                        item,
-                        dice_cost=(item.dice_cost - deduction).validify()
-                    )
-                return item, self
+                return item.with_new_cost(item.dice_cost.cost_less_elem(
+                    self.COST_DEDUCTION, Element.PYRO,
+                )), self
         return item, self
 
 
@@ -5835,25 +5806,20 @@ class SweepingTimeStatus(CharacterStatus, _InfusionStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_ELEM:
             assert isinstance(item, ActionPEvent)
             if (
                     self.dice_reduction_usages > 0
                     and status_source == item.source
                     and item.event_type is EventType.SKILL1
-                    and item.dice_cost[Element.GEO] >= self.DICE_REDUCTION
+                    and item.dice_cost.can_cost_less_elem(Element.GEO)
             ):
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.GEO: self.DICE_REDUCTION}).validify()
-                )
-                return item, replace(self, dice_reduction_usages=self.dice_reduction_usages - 1)
+                return item.with_new_cost(
+                    item.dice_cost.cost_less_elem(self.DICE_REDUCTION, Element.GEO)
+                ), replace(self, dice_reduction_usages=self.dice_reduction_usages - 1)
         return super()._preprocess(game_state, status_source, item, signal)
 
     @override
@@ -6416,13 +6382,10 @@ class KeenSightStatus(TalentEquipmentStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_ANY:
             assert isinstance(item, ActionPEvent)
             player = game_state.get_player(status_source.pid)
             characters = player.characters
@@ -6433,13 +6396,11 @@ class KeenSightStatus(TalentEquipmentStatus):
                     and characters.just_get_character(
                         cast(int, status_source.id)
                     ).character_statuses.contains(VijnanaSuffusionStatus)
-                    and item.dice_cost[Element.ANY] > 0
+                    and item.dice_cost.can_cost_less_any()
             ):
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
-                )
-                return item, self
+                return item.with_new_cost(
+                    item.dice_cost.cost_less_any(self.COST_DEDUCTION)
+                ), self
         return super()._preprocess(game_state, status_source, item, signal)
 
 
@@ -6553,14 +6514,13 @@ class StormzoneStatus(CombatStatus, _UsageStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SWAP:
+        if signal is Preprocessables.SWAP_COST_OMNI:
             assert isinstance(item, ActionPEvent) and item.event_type is EventType.SWAP
             if item.source.pid is status_source.pid \
                     and item.dice_cost.num_dice() >= self.COST_DEDUCTION:
-                assert item.dice_cost.num_dice() == item.dice_cost[Element.ANY]
                 assert not self.triggered
-                new_cost = (item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
-                return replace(item, dice_cost=new_cost), replace(self, triggered=True)
+                new_cost = item.dice_cost.cost_less_elem(self.COST_DEDUCTION)
+                return item.with_new_cost(new_cost), replace(self, triggered=True)
         return super()._preprocess(game_state, status_source, item, signal)
 
     @override
@@ -6594,22 +6554,17 @@ class WindsOfHarmonyStatus(CombatStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_ANY:
             assert isinstance(item, ActionPEvent)
             if status_source.pid is item.source.pid \
                     and item.event_sub_type is CharacterSkillType.NORMAL_ATTACK \
                     and item.dice_cost[Element.ANY] >= self.COST_DEDUCTION:
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.ANY: self.COST_DEDUCTION}).validify()
-                )
-                return item, None
+                return item.with_new_cost(
+                    item.dice_cost.cost_less_any(self.COST_DEDUCTION)
+                ), None
         return super()._preprocess(game_state, status_source, item, signal)
 
     @override
@@ -6639,7 +6594,7 @@ class DescentStatus(CharacterStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SWAP:
+        if signal is Preprocessables.SWAP_COST_OMNI:
             assert isinstance(item, ActionPEvent) and item.event_type is EventType.SWAP
             if item.source == status_source and item.dice_cost.can_cost_less_elem():
                 return (
@@ -6824,18 +6779,16 @@ class RiteOfDispatchStatus(CharacterStatus):
         """
         The assumption here is the equiper only pay elemental skill with electro or omni dice
         """
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_ELEM:
             assert isinstance(item, ActionPEvent)
             if (
                     status_source == item.source
                     and item.event_type is EventType.SKILL2
                     and item.dice_cost.num_dice() > 0
             ):
-                item = replace(
-                    item,
-                    dice_cost=(item.dice_cost - {Element.ELECTRO: self.COST_DEDUCTION}).validify()
-                )
-                return item, None
+                return item.with_new_cost(
+                    item.dice_cost.cost_less_elem(self.COST_DEDUCTION, Element.ELECTRO)
+                ), None
         return item, self
 
     @override

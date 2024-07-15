@@ -434,7 +434,7 @@ class ChainsOfWardingThunderSummon(_DmgPerRoundSummon):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SWAP:
+        if signal is Preprocessables.SWAP_COST_ANY:
             assert isinstance(item, ActionPEvent) and item.event_type is EventType.SWAP
             if item.source.pid is status_source.pid.other \
                     and self.swap_reduce_usages > 0:
@@ -1223,7 +1223,7 @@ class SolarIsotomaSummon(_DmgPerRoundSummon):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL and self.passive_usages > 0:
+        if signal is Preprocessables.SKILL_COST_ANY and self.passive_usages > 0:
             assert isinstance(item, ActionPEvent)
             if not (
                     item.source.pid is status_source.pid

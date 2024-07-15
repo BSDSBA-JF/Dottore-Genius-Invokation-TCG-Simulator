@@ -43,6 +43,7 @@
 - Applied version 4.4's balance patch (forgot to mention in 0.5.0).
 - Applied version 4.5's balance patch
 - Applied version 4.6's balance patch
+- Applied version 4.7's balance patch (Qiqi's details need verification)
 - Improved encoding for enums in the game such that encoded state always use
   different ID for different enums of different type.
 - Renamed `EncodingPlan.code_for` to `EncodingPlan.encode_item`.
@@ -51,6 +52,7 @@
 
 - Faulty description of size of encoded player state in documentation.
 - Faulty execution order of damage, swap, healing signals
+- Faulty deduction order or elemental dice cost
 
 ## 0.5.0 (31 Jan 2024)
 

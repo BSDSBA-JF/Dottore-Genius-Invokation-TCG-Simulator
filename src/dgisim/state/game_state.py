@@ -653,11 +653,7 @@ class SwapChecker:
             return EventSpeed.FAST_ACTION, None
 
         # Check if player can afford Normal Swap
-        _, swap_action = StatusProcessing.preprocess_by_all_statuses(
-            game_state=game_state,
-            pid=pid.other,  # start from opponent because cost raise goes first
-            pp_type=Preprocessables.SWAP,
-            item=ActionPEvent(
+        swap_action: ActionPEvent | PreprocessableEvent = ActionPEvent(
                 source=StaticTarget(
                     pid=pid,
                     zone=Zone.CHARACTERS,
@@ -671,8 +667,14 @@ class SwapChecker:
                 event_type=EventType.SWAP,
                 event_speed=game_state.mode.swap_speed(),
                 dice_cost=game_state.mode.swap_cost(),
-            ),
-        )
+            )
+        for pp_type in Preprocessables.swap_order:
+            game_state, swap_action = StatusProcessing.preprocess_by_all_statuses(
+                game_state=game_state,
+                pid=pid.other,  # start from opponent because cost raise goes first
+                pp_type=pp_type,
+                item=swap_action,
+            )
         assert isinstance(swap_action, ActionPEvent)
         if game_state.get_player(pid).dice.loosely_satisfy(swap_action.dice_cost):
             return swap_action.event_speed, swap_action.dice_cost
@@ -709,26 +711,29 @@ class SwapChecker:
                 None,
             )
         elif isinstance(action, act.SwapAction):
-            new_game_state, swap_action = StatusProcessing.preprocess_by_all_statuses(
-                game_state=game_state,
-                pid=pid.other,  # start from opponent because cost raise goes first
-                pp_type=Preprocessables.SWAP,
-                item=ActionPEvent(
-                    source=StaticTarget(
-                        pid=pid,
-                        zone=Zone.CHARACTERS,
-                        id=active_character_id,
-                    ),
-                    target=StaticTarget(
-                        pid=pid,
-                        zone=Zone.CHARACTERS,
-                        id=action.char_id,
-                    ),
-                    event_type=EventType.SWAP,
-                    event_speed=game_state.mode.swap_speed(),
-                    dice_cost=game_state.mode.swap_cost(),
+            new_game_state = game_state
+            swap_action: ActionPEvent | PreprocessableEvent = ActionPEvent(
+                source=StaticTarget(
+                    pid=pid,
+                    zone=Zone.CHARACTERS,
+                    id=active_character_id,
                 ),
+                target=StaticTarget(
+                    pid=pid,
+                    zone=Zone.CHARACTERS,
+                    id=action.char_id,
+                ),
+                event_type=EventType.SWAP,
+                event_speed=game_state.mode.swap_speed(),
+                dice_cost=game_state.mode.swap_cost(),
             )
+            for pp_type in Preprocessables.swap_order:
+                new_game_state, swap_action = StatusProcessing.preprocess_by_all_statuses(
+                    game_state=new_game_state,
+                    pid=pid.other,  # start from opponent because cost raise goes first
+                    pp_type=pp_type,
+                    item=swap_action,
+                )
             assert isinstance(swap_action, ActionPEvent)
             instruction_dice = action.instruction.dice
             player_dice = game_state.get_player(pid).dice
@@ -760,22 +765,25 @@ class SkillChecker:
         if skill_type is CharacterSkill.ELEMENTAL_BURST \
                 and character.energy < character.max_energy:
             return None
-        new_game_state, skill_event = StatusProcessing.preprocess_by_all_statuses(
-            game_state=game_state,
-            pid=pid,
-            pp_type=Preprocessables.SKILL,
-            item=ActionPEvent(
-                source=StaticTarget(
-                    pid=pid,
-                    zone=Zone.CHARACTERS,
-                    id=char_id,
-                ),
-                event_type=skill_type.to_event_type(),
-                event_sub_type=character.skill_actual_type(skill_type),
-                event_speed=EventSpeed.COMBAT_ACTION,
-                dice_cost=character.skill_cost(skill_type),
+        new_game_state = game_state
+        skill_event: ActionPEvent | PreprocessableEvent = ActionPEvent(
+            source=StaticTarget(
+                pid=pid,
+                zone=Zone.CHARACTERS,
+                id=char_id,
             ),
+            event_type=skill_type.to_event_type(),
+            event_sub_type=character.skill_actual_type(skill_type),
+            event_speed=EventSpeed.COMBAT_ACTION,
+            dice_cost=character.skill_cost(skill_type),
         )
+        for pp_type in Preprocessables.skill_order:
+            new_game_state, skill_event = StatusProcessing.preprocess_by_all_statuses(
+                game_state=new_game_state,
+                pid=pid,
+                pp_type=pp_type,
+                item=skill_event,
+            )
         assert isinstance(skill_event, ActionPEvent)
         if game_state.get_player(pid).dice.loosely_satisfy(skill_event.dice_cost):
             return new_game_state, skill_event.dice_cost
@@ -807,22 +815,24 @@ class SkillChecker:
         if skill_type is CharacterSkill.ELEMENTAL_BURST \
                 and character.energy < character.max_energy:  # pragma: no cover
             return None
-        game_state, skill_event = StatusProcessing.preprocess_by_all_statuses(
-            game_state=game_state,
-            pid=pid,
-            pp_type=Preprocessables.SKILL,
-            item=ActionPEvent(
-                source=StaticTarget(
-                    pid=pid,
-                    zone=Zone.CHARACTERS,
-                    id=character.id,
-                ),
-                event_type=skill_type.to_event_type(),
-                event_sub_type=character.skill_actual_type(skill_type),
-                event_speed=EventSpeed.COMBAT_ACTION,
-                dice_cost=character.skill_cost(skill_type),
+        skill_event: ActionPEvent | PreprocessableEvent = ActionPEvent(
+            source=StaticTarget(
+                pid=pid,
+                zone=Zone.CHARACTERS,
+                id=character.id,
             ),
+            event_type=skill_type.to_event_type(),
+            event_sub_type=character.skill_actual_type(skill_type),
+            event_speed=EventSpeed.COMBAT_ACTION,
+            dice_cost=character.skill_cost(skill_type),
         )
+        for pp_type in Preprocessables.skill_order:
+            game_state, skill_event = StatusProcessing.preprocess_by_all_statuses(
+                game_state=game_state,
+                pid=pid,
+                pp_type=pp_type,
+                item=skill_event,
+            )
         assert isinstance(skill_event, ActionPEvent)
         paid_dice = action.instruction.dice
         if paid_dice.just_satisfy(skill_event.dice_cost) \

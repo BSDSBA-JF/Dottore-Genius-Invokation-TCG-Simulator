@@ -239,20 +239,29 @@ class DunyarzadSupport(Support, stt._UsageLivingStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import CompanionCard
             if (
                     item.pid is status_source.pid
                     and issubclass(item.card_type, CompanionCard)
+                    and self.usages > 0
+                    and item.dice_cost.can_cost_less_elem()
             ):
-                new_item, new_self = item, self
-                if self.usages > 0 and item.dice_cost.can_cost_less_elem():
-                    new_item = new_item.with_new_cost(new_item.dice_cost.cost_less_elem(1))
-                    new_self = replace(new_self, usages=new_self.usages - 1)
-                if not self.drawed and not self.can_draw:
-                    new_self = replace(new_self, can_draw=True)
-                return new_item, new_self
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(1)),
+                    replace(self, usages=self.usages - 1),
+                )
+        elif signal is Preprocessables.CARD1:
+            assert isinstance(item, CardPEvent)
+            from ..card.card import CompanionCard
+            if (
+                    item.pid is status_source.pid
+                    and issubclass(item.card_type, CompanionCard)
+                    and not self.drawed
+                    and not self.can_draw
+            ):
+                return item, replace(self, can_draw=True)
         return item, self
 
     @override
@@ -488,7 +497,7 @@ class MasterZhangSupport(Support, stt._UsageLivingStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import WeaponEquipmentCard
             if (
@@ -740,7 +749,7 @@ class XudongSupport(Support):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import FoodCard
             if (
@@ -786,7 +795,7 @@ class YayoiNanatsukiSupport(Support, stt._UsageLivingStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1:
+        if signal is Preprocessables.CARD1_COST_OMNI:
             assert isinstance(item, CardPEvent)
             from ..card.card import ArtifactEquipmentCard
             if (
@@ -1037,7 +1046,7 @@ class SumeruCitySupport(Support, stt._UsageLivingStatus):
             item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.SKILL:
+        if signal is Preprocessables.SKILL_COST_OMNI:
             assert isinstance(item, ActionPEvent)
             if not (
                     self.usages > 0
@@ -1051,7 +1060,7 @@ class SumeruCitySupport(Support, stt._UsageLivingStatus):
                     item.with_new_cost(item.dice_cost.cost_less_elem(1)),
                     replace(self, usages=self.usages - 1),
                 )
-        elif signal is Preprocessables.CARD1:
+        elif signal is Preprocessables.CARD1_COST_OMNI:
             # though the part below is kinda a duplicate of the above block of code,
             # the CardPEvent may become more different with ActionPEvent in the future,
             # so leave it as it is.
