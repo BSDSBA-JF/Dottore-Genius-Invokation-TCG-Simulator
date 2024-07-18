@@ -837,23 +837,32 @@ class HeraldOfFrostSummon(_DmgPerRoundSummon):
                     recovery=self.HEAL_AMOUNT,
                 ),
             ]
-            if self.one_time_healing_available:
-                # TODO: check if triggering avoids over-healing
-                # TODO: here we assume the most damaged character is determined before
-                #       active healing
-                recoveries.append(
+            return recoveries, replace(self, usages=0, activated=False)
+        elif signal is TriggeringSignal.DIRECT_TRIGGER and self.one_time_healing_available:
+            if any(
+                    char.hp_lost() > 0
+                    for char in game_state.get_player(source.pid).characters.get_alive_characters()
+            ):
+                return [
                     eft.RecoverHPEffect(
                         source=StaticTarget.from_summon(source.pid, type(self)),
                         target=StaticTarget.from_player_active(game_state, source.pid),
                         recovery=self.HEAL_AMOUNT,
                     ),
-                )
-            return recoveries, replace(
-                self, usages=0, activated=False, one_time_healing_available=False,
-            )
+                ], replace(self, usages=0, one_time_healing_available=False)
         elif signal is TriggeringSignal.ROUND_END and not self.one_time_healing_available:
             return [], replace(self, usages=0, one_time_healing_available=True)
         return super()._react_to_signal(game_state, source, signal, detail)
+
+    @override
+    def react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent = None,
+    ) -> list[eft.Effect]:
+        es = super().react_to_signal(game_state, source, signal, detail)
+        if signal is TriggeringSignal.POST_SKILL and self.activated and self.one_time_healing_available:
+            es.append(eft.TriggerSummonEffect(source.pid, type(self), TriggeringSignal.DIRECT_TRIGGER))
+        return es
 
     @override
     def content_repr(self) -> str:

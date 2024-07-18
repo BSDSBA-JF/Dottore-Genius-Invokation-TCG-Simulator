@@ -119,6 +119,24 @@ class TestQiqi(unittest.TestCase):
         self.assertEqual(p1c2.hp, 9)
         self.assertEqual(p1c3.hp, 6)
 
+    def test_herald_of_frost_summon_special_healing(self):
+        game_state = AddSummonEffect(Pid.P1, HeraldOfFrostSummon).execute(self.BASE_GAME)
+        game_state = set_hp(game_state, Pid.P1, 9, char_id=2)
+        game_state = end_round(game_state, Pid.P2)
+        game_state = grant_all_infinite_revival(game_state)
+
+        # no active healing when all hp are full
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
+        self.assertEqual(p1_active_char(game_state).hp, 10)
+
+        game_state = set_hp(game_state, Pid.P1, 7, char_id=2)
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
+        self.assertEqual(p1_active_char(game_state).hp, 9)
+
+        game_state = set_hp(game_state, Pid.P1, 7, char_id=2)
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1)
+        self.assertEqual(p1_active_char(game_state).hp, 8)
+
     def test_fortune_preserving_talisman_status(self):
         game_state = AddCombatStatusEffect(
             Pid.P1, FortunePreservingTalismanStatus

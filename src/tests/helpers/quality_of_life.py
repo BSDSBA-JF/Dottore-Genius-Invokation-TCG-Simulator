@@ -9,6 +9,7 @@ from src.dgisim.agents import *
 from src.dgisim.card.card import Card
 from src.dgisim.card.cards import Cards
 from src.dgisim.character.character import Character
+from src.dgisim.character.characters import Characters
 from src.dgisim.character.enums import CharacterSkill
 from src.dgisim.deck import Deck
 from src.dgisim.dice import ActualDice
@@ -357,6 +358,59 @@ def kill_character(
             ).build()
         ).build()
     ).build()
+
+
+def set_hp(
+        game_state: GameState, pid: Pid, hp: int,
+        char_id: None | int = None, revive: bool = False, observe: bool = False,
+) -> GameState:
+    """
+    :param hp: should be greater than 0, because this function is not for killing characters.
+
+    It is not advised to revive characters with this function.
+    As revival will be treated as healing, and may cause further effects.
+    """
+    assert hp > 0
+    cs = game_state.get_player(pid).characters
+    if char_id is not None:
+        c = cs.just_get_character(char_id)
+        if c.is_defeated():
+            return auto_step(ReviveRecoverHPEffect(
+                StaticTarget.from_char_id(pid, char_id),
+                StaticTarget.from_char_id(pid, char_id),
+                recovery=hp,
+            ).execute(game_state), observe=True)
+        return game_state.factory().f_player(
+            pid,
+            lambda p: p.factory().characters(
+                cs.factory().f_character(
+                    char_id,  # type: ignore
+                    lambda c: c.factory().hp(min(hp, c.max_hp)).alive(hp > 0).build()
+                ).build()
+            ).build()
+        ).build()
+
+    game_state = game_state.factory().f_player(
+        pid,
+        lambda p: p.factory().characters(
+            cs.factory().f_characters(
+                lambda chars: tuple([
+                    char.factory().hp(
+                        min(hp, char.max_hp) if char.alive else 0
+                    ).build()
+                    for char in chars
+                ])
+            ).build()
+        ).build()
+    ).build()
+    for char in cs:
+        if char.is_defeated():
+            game_state = auto_step(ReviveRecoverHPEffect(
+                StaticTarget.from_char_id(pid, char.id),
+                StaticTarget.from_char_id(pid, char.id),
+                recovery=hp,
+            ).execute(game_state), observe=observe)
+    return game_state
 
 
 def next_round(game_state: GameState, observe: bool = False) -> GameState:
