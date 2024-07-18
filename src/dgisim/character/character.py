@@ -2742,6 +2742,11 @@ class Lisa(Character):
                 target_pid=source.pid,
                 summon=sm.LightningRoseSummon,
             ),
+            eft.RelativeAddCharacterStatusEffect(
+                source_pid=source.pid,
+                target=DynamicCharacterTarget.OPPO_ACTIVE,
+                status=stt.ConductiveStatus,
+            ),
         )
 
     @classmethod

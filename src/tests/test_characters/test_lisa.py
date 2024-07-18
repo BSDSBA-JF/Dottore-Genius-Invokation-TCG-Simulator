@@ -107,6 +107,10 @@ class TestLisa(unittest.TestCase):
         self.assertEqual(dmg.damage, 2)
         self.assertIs(dmg.element, Element.ELECTRO)
         self.assertIn(LightningRoseSummon, game_state.player1.summons)
+        p2ac = p2_active_char(game_state)
+        self.assertIn(ConductiveStatus, p2ac.character_statuses)
+        conductive_status = p2ac.character_statuses.just_find(ConductiveStatus)
+        self.assertEqual(conductive_status.usages, 2)
 
     def test_conductive_status(self):
         game_state = RelativeAddCharacterStatusEffect(
