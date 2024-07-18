@@ -2067,7 +2067,7 @@ class KaedeharaKazuha(Character):
                 source=source,
                 target=DynamicCharacterTarget.OPPO_ACTIVE,
                 element=Element.ANEMO,
-                damage=3,
+                damage=1,
                 damage_type=DamageType(elemental_skill=True),
             ),
             eft.AddCharacterStatusEffect(
@@ -2075,9 +2075,11 @@ class KaedeharaKazuha(Character):
                 status=midare_to_use,
             ),
         )
-        if self.talent_equipped() \
-                and reaction is not None \
-                and reaction.first_elem in stt._POETICS_OF_FUUBUTSU_MAP:
+        if (
+                self.talent_equipped()
+                and reaction is not None
+                and reaction.first_elem in stt._POETICS_OF_FUUBUTSU_MAP
+        ):
             poetic_status = stt._POETICS_OF_FUUBUTSU_MAP[reaction.first_elem]
             effects += (
                 eft.AddCombatStatusEffect(
@@ -2098,7 +2100,7 @@ class KaedeharaKazuha(Character):
         reaction = Reaction.consult_reaction_with_aura(oppo_active_character_aura, Element.ANEMO)
         summon_element: None | Element = None
         if reaction is not None:
-            assert reaction.first_elem in stt._MIDARE_RANZAN_MAP
+            assert reaction.first_elem in Reaction.SWIRL.first_elems
             summon_element = reaction.first_elem
         effects: tuple[eft.Effect, ...] = (
             eft.EnergyDrainEffect(
@@ -2109,7 +2111,7 @@ class KaedeharaKazuha(Character):
                 source=source,
                 target=DynamicCharacterTarget.OPPO_ACTIVE,
                 element=Element.ANEMO,
-                damage=3,
+                damage=1,
                 damage_type=DamageType(elemental_burst=True),
             ),
             eft.UpdateSummonEffect(

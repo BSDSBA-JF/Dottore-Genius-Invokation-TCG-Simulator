@@ -4,15 +4,10 @@ from .common_imports import *
 
 
 class TestElementalResonanceFerventFlames(unittest.TestCase):
-    BASE_GAME = PublicAddCardEffect(
-        Pid.P1, card=ElementalResonanceFerventFlames
-    ).execute(ACTION_TEMPLATE).factory().f_player1(
-        lambda p1: p1.factory().f_characters(
-            lambda cs: cs.factory().character(
-                KaedeharaKazuha.from_default(1)
-            ).build()
-        ).build()
-    ).build()
+    BASE_GAME = replace_character_make_active_add_card(
+        ACTION_TEMPLATE, Pid.P1, KaedeharaKazuha,
+        char_id=1, card=ElementalResonanceFerventFlames
+    )
 
     def test_card_in_deck(self):
         self.assertFalse(
@@ -55,7 +50,7 @@ class TestElementalResonanceFerventFlames(unittest.TestCase):
         p1_combat_statuses = game_state.player1.combat_statuses
         p2ac = game_state.player2.just_get_active_character()
         self.assertNotIn(ElementalResonanceFerventFlamesStatus, p1_combat_statuses)
-        self.assertEqual(p2ac.hp, 2)
+        self.assertEqual(p2ac.hp, 4)
 
         # Summon doesn't trigger
         game_state = AddSummonEffect(Pid.P1, OceanicMimicRaptorSummon).execute(base_state)
@@ -78,6 +73,6 @@ class TestElementalResonanceFerventFlames(unittest.TestCase):
         p1_combat_statuses = game_state.player1.combat_statuses
         p2c1, p2c2, p2c3 = game_state.player2.characters.get_characters()
         self.assertNotIn(ElementalResonanceFerventFlamesStatus, p1_combat_statuses)
-        self.assertEqual(p2c1.hp, 7)
+        self.assertEqual(p2c1.hp, 9)
         self.assertEqual(p2c2.hp, 9)
         self.assertEqual(p2c3.hp, 4)

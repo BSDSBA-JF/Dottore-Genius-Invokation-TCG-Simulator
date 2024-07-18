@@ -38,11 +38,11 @@ class Element(Enum):
     def __repr__(self) -> str:
         return self.name
 
-    def is_pure_element(self) -> bool:
+    def is_pure(self) -> bool:
         """ :returns: `True` if the element is a pure element. """
         return self in PURE_ELEMENTS
 
-    def is_aurable_element(self) -> bool:
+    def is_aurable(self) -> bool:
         """ :returns: `True` if the element is an aurable element. """
         return self in AURA_ELEMENTS
 
@@ -178,11 +178,26 @@ class Reaction(Enum):
                 return ReactionDetail(reaction, elem, second)
         return None
 
+    @property
     def damage_boost(self) -> int:
         """
         :returns: the direct damage boost of the reaction.
         """
         return self.value.damage_boost
+
+    @property
+    def first_elems(self) -> frozenset[Element]:
+        """
+        :returns: the elements that require to be applied to the character before the reaction.
+        """
+        return self.value.reaction_elems[0]
+    
+    @property
+    def second_elems(self) -> frozenset[Element]:
+        """
+        :returns: the elements that triggers the reaction with the applied elements.
+        """
+        return self.value.reaction_elems[1]
 
 
 @dataclass(frozen=True)

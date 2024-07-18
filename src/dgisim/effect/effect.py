@@ -1195,7 +1195,7 @@ class SpecificDamageEffect(DirectEffect):
         if reaction is not None:
             reactioned_damage = replace(
                 reactioned_damage,
-                damage=reactioned_damage.damage + reaction.reaction_type.damage_boost(),
+                damage=reactioned_damage.damage + reaction.reaction_type.damage_boost,
             )
         game_state, actual_damage = self._damage_confirmation(game_state, reactioned_damage)
         if new_aura != old_aura:

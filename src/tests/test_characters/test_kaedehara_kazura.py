@@ -5,150 +5,78 @@ from src.tests.test_characters.common_imports import *
 
 
 class TestKaedeharaKazuha(unittest.TestCase):
-    BASE_GAME = ACTION_TEMPLATE.factory().f_player1(
-        lambda p: p.factory().f_characters(
-            lambda cs: cs.factory().active_character_id(
-                2
-            ).character(
-                KaedeharaKazuha.from_default(2)
-            ).build()
-        ).f_hand_cards(
-            lambda hcs: hcs.add(PoeticsOfFuubutsu)
-        ).dice(
-            ActualDice({Element.OMNI: 100})  # even number
-        ).build()
-    ).f_player2(
-        lambda p: p.factory().phase(
-            Act.END_PHASE
-        ).build()
-    ).build()
+    BASE_GAME = replace_character_make_active_add_card(
+        ACTION_TEMPLATE, Pid.P1,
+        KaedeharaKazuha,
+        char_id=2,
+        card=PoeticsOfFuubutsu,
+    )
     assert type(BASE_GAME.player1.just_get_active_character()) is KaedeharaKazuha
 
     def test_normal_attack(self):
-        a1, a2 = PuppetAgent(), PuppetAgent()
-        gsm = GameStateMachine(self.BASE_GAME, a1, a2)
-        a1.inject_action(SkillAction(
-            skill=CharacterSkill.SKILL1,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
-        ))
-        p2ac = gsm.get_game_state().player2.just_get_active_character()
-        self.assertEqual(p2ac.hp, 10)
-
-        gsm.player_step()
-        gsm.auto_step()
-        p2ac = gsm.get_game_state().player2.just_get_active_character()
-        self.assertEqual(p2ac.hp, 8)
-        self.assertFalse(p2ac.elemental_aura.elem_auras())
+        game_state = add_dmg_listener(self.BASE_GAME, Pid.P1)
+        game_state = step_skill(
+            game_state,
+            Pid.P1,
+            CharacterSkill.SKILL1,
+            dice=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+        )
+        dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
+        self.assertEqual(dmg.damage, 2)
+        self.assertIs(dmg.element, Element.PHYSICAL)
 
     def test_elemental_skill1(self):
-        a1, a2 = PuppetAgent(), PuppetAgent()
-        base_game = self.BASE_GAME.factory().f_player2(
-            lambda p2: p2.factory().phase(Act.END_PHASE).build()
-        ).build()
-        elems = [None, Element.PYRO, Element.HYDRO, Element.ELECTRO, Element.CRYO]
+        from src.dgisim.status.status import _MIDARE_RANZAN_MAP
+        base_state = add_dmg_listener(self.BASE_GAME, Pid.P1)
+        elems = [Element.ANEMO, Element.PYRO, Element.HYDRO, Element.ELECTRO, Element.CRYO]
         for elem in elems:
             with self.subTest(elem=elem):
-                if elem is None:
-                    game_state = base_game
+                if elem.is_aurable():
+                    game_state = oppo_aura_elem(base_state, elem)
                 else:
-                    game_state = oppo_aura_elem(base_game, elem)
+                    game_state = base_state
 
-                gsm = GameStateMachine(game_state, a1, a2)
-                a1.inject_action(SkillAction(
-                    skill=CharacterSkill.SKILL2,
-                    instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
-                ))
-                p2ac = gsm.get_game_state().player2.just_get_active_character()
-                self.assertEqual(p2ac.hp, 10)
+                game_state = step_skill(
+                    game_state, Pid.P1, CharacterSkill.SKILL2,
+                    ActualDice({Element.ANEMO: 3}),
+                )
 
                 # first skill
-                gsm.player_step()
-                gsm.auto_step()
-                p2cs = gsm.get_game_state().player2.characters
-                p2c1, p2c2, p2c3 = (p2cs.just_get_character(i) for i in range(1, 4))
-                self.assertEqual(p2c1.hp, 7)
+                p2c1, p2c2, p2c3 = p2_chars(game_state)
+                self.assertEqual(p2c1.hp, 9)
                 self.assertFalse(p2c1.elemental_aura.has_aura())
-                if elem is not None:
+                if elem.is_aurable():
                     self.assertEqual(p2c2.hp, 9)
                     self.assertEqual(p2c3.hp, 9)
                     self.assertTrue(p2c2.elemental_aura.has_aura())
                     self.assertTrue(p2c3.elemental_aura.has_aura())
-                p1ac = gsm.get_game_state().player1.just_get_active_character()
-                self.assertEqual(p1ac.id, 3)
-
-                # swap back and plunge attack
-                a1.inject_actions([
-                    SwapAction(
-                        char_id=2,
-                        instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 1}))
-                    ),
-                    SkillAction(
-                        skill=CharacterSkill.SKILL1,
-                        instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
-                    ),
-                    EndRoundAction(),
-                ])
-                gsm.step_until_next_phase()
-                p2cs = gsm.get_game_state().player2.characters
-                p2c1, p2c2, p2c3 = (p2cs.just_get_character(i) for i in range(1, 4))
-                self.assertEqual(p2c1.hp, 4)
-                if elem is None:
-                    self.assertFalse(p2c1.elemental_aura.has_aura())
                 else:
+                    self.assertEqual(p2c2.hp, 10)
+                    self.assertEqual(p2c3.hp, 10)
+                    self.assertFalse(p2c2.elemental_aura.has_aura())
+                    self.assertFalse(p2c3.elemental_aura.has_aura())
+                p1ac = p1_active_char(game_state)
+                self.assertEqual(p1ac.id, 3)
+                kazuha = game_state.player1.characters.just_get_character(2)
+                self.assertIn(_MIDARE_RANZAN_MAP[elem], kazuha.character_statuses)
+
+                # swap back and auto plunge attack
+                assert game_state.waiting_for() is Pid.P2
+                game_state = skip_action_round_until(game_state, Pid.P1)
+                game_state = step_swap(game_state, Pid.P1, 2)
+                dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
+                self.assertIs(dmg.element, elem)
+                p2c1, p2c2, p2c3 = p2_chars(game_state)
+                self.assertEqual(p2c1.hp, 7)
+                if elem.is_aurable():
                     self.assertIn(elem, p2c1.elemental_aura)
-                if elem is not None:
-                    self.assertEqual(p2c2.hp, 9)
-                    self.assertEqual(p2c3.hp, 9)
-                    self.assertTrue(p2c2.elemental_aura.has_aura())
-                    self.assertTrue(p2c3.elemental_aura.has_aura())
-                p1ac = gsm.get_game_state().player1.just_get_active_character()
+                else:
+                    self.assertFalse(p2c1.elemental_aura.has_aura())
+
+                p1ac = p1_active_char(game_state)
                 self.assertEqual(p1ac.id, 2)
-                from src.dgisim.status.status import _MIDARE_RANZAN_MAP
                 for status in p1ac.character_statuses:
                     self.assertNotIn(type(status), _MIDARE_RANZAN_MAP.values())
-
-    def test_midare_ranzan_status(self):
-        a1, a2 = PuppetAgent(), PuppetAgent()
-        base_game_state = self.BASE_GAME.factory().f_player1(
-            lambda p1: p1.factory().f_characters(
-                lambda cs: cs.factory().f_active_character(
-                    lambda c: c.factory().f_character_statuses(
-                        lambda css: css.update_status(MidareRanzanStatus(_protected=False))
-                    ).build()
-                ).build()
-            ).build()
-        ).build()
-        elems = [Element.ANEMO, Element.PYRO, Element.HYDRO, Element.ELECTRO, Element.CRYO]
-        # test if using skill when having MidareRanzan behaves correctly
-        for elem in elems:
-            with self.subTest(elem=elem):
-                if elem is Element.ANEMO:
-                    game_state = base_game_state
-                else:
-                    game_state = oppo_aura_elem(base_game_state, elem)
-                from src.dgisim.status.status import _MIDARE_RANZAN_MAP
-                new_midare_status = _MIDARE_RANZAN_MAP[elem]
-
-                gsm = GameStateMachine(game_state, a1, a2)
-                a1.clear()
-                a2.clear()
-                a1.inject_action(SkillAction(
-                    skill=CharacterSkill.SKILL2,
-                    instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
-                ))
-                p2ac = gsm.get_game_state().player2.just_get_active_character()
-                self.assertEqual(p2ac.hp, 10)
-
-                # first skill
-                gsm.player_step()
-                gsm.auto_step()
-                p1_kazuha = gsm.get_game_state().player1.characters.just_get_character(2)
-                p1_kazuha_stts = p1_kazuha.character_statuses
-                for midare in _MIDARE_RANZAN_MAP.values():
-                    if midare is new_midare_status:
-                        self.assertIn(midare, p1_kazuha_stts)
-                    else:
-                        self.assertNotIn(midare, p1_kazuha_stts)
 
     def test_elemental_burst(self):
         a1, a2 = PuppetAgent(), PuppetAgent()
@@ -174,7 +102,7 @@ class TestKaedeharaKazuha(unittest.TestCase):
         gsm.auto_step()
         p2cs = gsm.get_game_state().player2.characters
         p2c1, p2c2, p2c3 = (p2cs.just_get_character(i) for i in range(1, 4))
-        self.assertEqual(p2c1.hp, 7)
+        self.assertEqual(p2c1.hp, 9)
         self.assertEqual(p2c2.hp, 10)
         self.assertEqual(p2c3.hp, 10)
         self.assertFalse(p2c1.elemental_aura.has_aura())
@@ -217,7 +145,7 @@ class TestKaedeharaKazuha(unittest.TestCase):
                 gsm.auto_step()
                 p2cs = gsm.get_game_state().player2.characters
                 p2c1, p2c2, p2c3 = (p2cs.just_get_character(i) for i in range(1, 4))
-                self.assertEqual(p2c1.hp, 7)
+                self.assertEqual(p2c1.hp, 9)
                 self.assertEqual(p2c2.hp, 9)
                 self.assertEqual(p2c3.hp, 9)
                 self.assertFalse(p2c1.elemental_aura.has_aura())
@@ -356,55 +284,37 @@ class TestKaedeharaKazuha(unittest.TestCase):
         p1ac = gsm.get_game_state().player1.just_get_active_character()
         p2ac = gsm.get_game_state().player2.just_get_active_character()
         p1_kazuha = gsm.get_game_state().player1.characters.just_get_character(2)
-        self.assertEqual(p2ac.hp, 7)
+        self.assertEqual(p2ac.hp, 9)
         self.assertFalse(p2ac.elemental_aura.has_aura())
         self.assertEqual(p1ac.id, 3)
         self.assertIn(PoeticsOfFuubutsuStatus, p1_kazuha.character_statuses)
 
     def test_poetics_of_fuubutsu_status(self):
-        a1, a2 = PuppetAgent(), PuppetAgent()
-        base_game = self.BASE_GAME.factory().f_player1(
-            lambda p1: p1.factory().f_characters(
-                lambda cs: cs.factory().f_active_character(
-                    lambda ac: ac.factory().f_character_statuses(
-                        lambda eqs: eqs.update_status(PoeticsOfFuubutsuStatus())
-                    ).build()
-                ).build()
-            ).build()
-        ).f_player2(
-            lambda p2: p2.factory().phase(Act.END_PHASE).build()
-        ).build()
-        game_state = oppo_aura_elem(base_game, Element.ELECTRO)
-        gsm = GameStateMachine(game_state, a1, a2)
-        a1.inject_action(
-            SkillAction(
-                skill=CharacterSkill.SKILL2,
-                instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
-            )
-        )
-        gsm.player_step()
-        gsm.auto_step()
+        base_state = AddCharacterStatusEffect(
+            target=StaticTarget.from_player_active(self.BASE_GAME, Pid.P1),
+            status=PoeticsOfFuubutsuStatus,
+        ).execute(self.BASE_GAME)
+        base_state = end_round(base_state, Pid.P2)
+        base_state = add_dmg_listener(base_state, Pid.P1)
+        base_state = grant_all_infinite_revival(base_state)
 
-        p2ac = gsm.get_game_state().player2.just_get_active_character()
-        self.assertEqual(p2ac.hp, 7)
-        p1_combat_statuses = gsm.get_game_state().player1.combat_statuses
+        game_state = oppo_aura_elem(base_state, Element.ELECTRO)
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL2)
+
+        p1_combat_statuses = game_state.player1.combat_statuses
         self.assertEqual(p1_combat_statuses.just_find(PoeticsOfFuubutsuElectroStatus).usages, 2)
         self.assertNotIn(PoeticsOfFuubutsuPyroStatus, p1_combat_statuses)
         self.assertNotIn(PoeticsOfFuubutsuHydroStatus, p1_combat_statuses)
         self.assertNotIn(PoeticsOfFuubutsuCryoStatus, p1_combat_statuses)
 
-        game_state = gsm.get_game_state()
         game_state = add_damage_effect(
-            game_state,
-            1,
-            Element.ELECTRO,
+            game_state, 1, Element.ELECTRO,
             char_id=3,
             damage_type=DamageType(elemental_skill=True)
-        )
-        game_state = auto_step(game_state)
+        ).auto_step()
 
-        p2ac = game_state.player2.just_get_active_character()
-        self.assertEqual(p2ac.hp, 5)
+        dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
+        self.assertEqual(dmg.damage, 2)
         p1_combat_statuses = game_state.player1.combat_statuses
         self.assertEqual(p1_combat_statuses.just_find(PoeticsOfFuubutsuElectroStatus).usages, 1)
         self.assertNotIn(PoeticsOfFuubutsuPyroStatus, p1_combat_statuses)
@@ -413,35 +323,25 @@ class TestKaedeharaKazuha(unittest.TestCase):
 
         game_state = remove_aura(game_state)
         game_state = add_damage_effect(
-            game_state,
-            1,
-            Element.PYRO,
+            game_state, 1, Element.PYRO,
             char_id=3,
             damage_type=DamageType(elemental_skill=True)
-        )
-        game_state = auto_step(game_state)
+        ).auto_step()
 
-        p2ac = game_state.player2.just_get_active_character()
-        self.assertEqual(p2ac.hp, 4)
+        dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
+        self.assertEqual(dmg.damage, 1)
 
-        game_state = kill_character(game_state, 1, hp=10)
-        game_state = oppo_aura_elem(game_state, Element.PYRO)
+        game_state = apply_elemental_aura(game_state, Element.PYRO, Pid.P2)
+        for status in game_state.player1.characters.just_get_character(2).character_statuses:
+            if isinstance(status, MidareRanzanStatus):
+                game_state = RemoveCharacterStatusEffect(
+                    target=StaticTarget.from_char_id(Pid.P1, 2),
+                    status=type(status),
+                ).execute(game_state)
 
-        gsm = GameStateMachine(game_state, a1, a2)
-        a1.inject_actions([
-            SwapAction(
-                char_id=2,
-                instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 1}))
-            ),
-            SkillAction(
-                skill=CharacterSkill.SKILL2,
-                instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
-            ),
-        ])
-        gsm.player_step()
-        gsm.player_step()
-        gsm.auto_step()
-        p1_combat_statuses = gsm.get_game_state().player1.combat_statuses
+        game_state = step_swap(game_state, Pid.P1, 2)
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL2)
+        p1_combat_statuses = game_state.player1.combat_statuses
         self.assertEqual(p1_combat_statuses.just_find(PoeticsOfFuubutsuPyroStatus).usages, 2)
         self.assertEqual(p1_combat_statuses.just_find(PoeticsOfFuubutsuElectroStatus).usages, 1)
         self.assertNotIn(PoeticsOfFuubutsuHydroStatus, p1_combat_statuses)

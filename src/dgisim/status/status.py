@@ -4565,7 +4565,7 @@ class RadicalVitalityStatus(CharacterStatus, _UsageLivingStatus):
             if (
                     not self.activated
                     and dmg.source == status_source
-                    and dmg.element.is_pure_element()
+                    and dmg.element.is_pure()
                     and dmg.damage_type.directly_from_character()
                     and self.usages < self.max_usages(game_state, status_source)
             ):
@@ -4599,7 +4599,7 @@ class RadicalVitalityStatus(CharacterStatus, _UsageLivingStatus):
             assert isinstance(detail, DmgIEvent)
             if (
                     detail.dmg.target == source
-                    and detail.dmg.element.is_pure_element()
+                    and detail.dmg.element.is_pure()
                     and self.usages < self.max_usages(game_state, source)
             ):
                 return [], replace(self, usages=1)
@@ -4663,52 +4663,41 @@ class ChihayaburuStatus(CharacterHiddenStatus):
         return [], self
 
 @dataclass(frozen=True, kw_only=True)
-class MidareRanzanStatus(CharacterStatus):
-    _protected: bool = True
-    _needs_removal: bool = False
+class MidareRanzanStatus(CharacterStatus, PrepareSkillStatus):
+    to_remove: bool = False
     _ELEMENT: ClassVar[Element] = Element.ANEMO
-    _DMG_BOOST: ClassVar[int] = 1
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ACT_PRE_SKILL,
         TriggeringSignal.POST_SKILL,
     ))
 
     @override
-    def _inform(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            info_type: Informables,
-            information: InformableEvent,
-    ) -> Self:
-        if info_type is Informables.POST_SKILL_USAGE:
-            assert isinstance(information, SkillIEvent)
-            if information.source == status_source \
-                    and not self._protected \
-                    and not self._needs_removal:
-                return replace(self, _needs_removal=True)
-        return self
-
-    @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if isinstance(item, DmgPEvent):
-            dmg = item.dmg
-            if status_source != dmg.source:
-                return item, self
-
-            if signal is Preprocessables.DMG_ELEMENT:
-                if dmg.damage_type.direct_plunge_attack():
-                    new_item = DmgPEvent(dmg=replace(dmg, element=self._ELEMENT))
-                    return new_item, self
-            elif signal is Preprocessables.DMG_AMOUNT_PLUS:
-                if dmg.damage_type.direct_plunge_attack():
-                    new_item = DmgPEvent(dmg=replace(dmg, damage=dmg.damage + self._DMG_BOOST))
-                    return new_item, None
+        if signal is Preprocessables.DMG_ELEMENT:
+            assert isinstance(item, DmgPEvent)
+            if (
+                    item.dmg.source == status_source
+                    and item.dmg.damage_type.direct_normal_attack()
+                    and item.dmg.element is Element.PHYSICAL
+            ):
+                return item.convert_element(self._ELEMENT), self
+        elif signal is Preprocessables.SWAP:
+            assert isinstance(item, ActionPEvent) and item.event_type is EventType.SWAP
+            if (
+                    item.target == status_source
+                    and item.is_combat_action()
+            ):
+                return item.make_fast_action(), self
+        elif signal is Preprocessables.DMG_AMOUNT_PLUS:
+            assert isinstance(item, DmgPEvent)
+            if (
+                    item.dmg.source == status_source
+                    and item.dmg.damage_type.direct_normal_attack()
+            ):
+                return item, replace(self, to_remove=True)
         return item, self
 
     @override
@@ -4716,15 +4705,14 @@ class MidareRanzanStatus(CharacterStatus):
             self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
             detail: None | InformableEvent
     ) -> tuple[list[eft.Effect], None | Self]:
-        if signal is TriggeringSignal.POST_SKILL:
-            if self._protected:
-                return [], replace(self, _protected=False)
-            elif self._needs_removal:
-                return [], None
+        if signal is TriggeringSignal.POST_SKILL and self.to_remove:
+            return [], None
+        elif signal is TriggeringSignal.ACT_PRE_SKILL:
+            return [eft.CastSkillEffect(
+                target=source,
+                skill=CharacterSkill.SKILL1,
+            )], self
         return [], self
-
-    def __str__(self) -> str:
-        return super().__str__() + f"({self._protected}, {self._needs_removal})"
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -4873,10 +4861,7 @@ class ColdBloodedStrikeStatus(TalentEquipmentStatus):
 
     @override
     def _inform(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            info_type: Informables,
+            self, game_state: GameState, status_source: StaticTarget, info_type: Informables,
             information: InformableEvent,
     ) -> Self:
         if self.activated or self.usages == 0:

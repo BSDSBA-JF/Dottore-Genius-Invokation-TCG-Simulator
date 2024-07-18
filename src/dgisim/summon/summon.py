@@ -273,7 +273,7 @@ class _ConvertableAnemoSummon(_DestroyOnNumSummon):
                     .elemental_aura
                 )
                 reaction = Reaction.consult_reaction_with_aura(opponent_aura, Element.ANEMO)
-                if reaction is not None and reaction.first_elem in stt._MIDARE_RANZAN_MAP:
+                if reaction is not None and reaction.first_elem in Reaction.SWIRL.first_elems:
                     new_self = replace(
                         new_self,
                         curr_elem=reaction.first_elem,

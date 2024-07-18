@@ -28,6 +28,18 @@ class CharacterSkill(Enum):
             return EventType.ELEMENTAL_BURST
         raise NotImplementedError
 
+    def is_skill1(self) -> bool:
+        return self is CharacterSkill.SKILL1
+    
+    def is_skill2(self) -> bool:
+        return self is CharacterSkill.SKILL2
+
+    def is_skill3(self) -> bool:
+        return self is CharacterSkill.SKILL3
+
+    def is_elemental_burst(self) -> bool:
+        return self is CharacterSkill.ELEMENTAL_BURST
+
 class CharacterSkillType(Enum):
     """ Describes the category of the skill.  """
     NORMAL_ATTACK = 0

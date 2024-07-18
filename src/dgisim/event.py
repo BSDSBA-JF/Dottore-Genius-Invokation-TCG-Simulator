@@ -73,6 +73,21 @@ class EventType(Enum):
             or self is EventType.ELEMENTAL_BURST
         )
 
+    def is_skill1(self) -> bool:
+        return self is EventType.SKILL1
+
+    def is_skill2(self) -> bool:
+        return self is EventType.SKILL2
+
+    def is_skill3(self) -> bool:
+        return self is EventType.SKILL3
+
+    def is_elemental_burst(self) -> bool:
+        return self is EventType.ELEMENTAL_BURST
+
+    def is_swap(self) -> bool:
+        return self is EventType.SWAP
+
 
 @dataclass(frozen=True, kw_only=True)
 class InformableEvent:
@@ -165,6 +180,14 @@ class ActionPEvent(PreprocessableEvent):
     def with_new_cost(self, new_cost: AbstractDice) -> Self:
         return replace(self, dice_cost=new_cost)
 
+    def is_combat_action(self) -> bool:
+        return self.event_speed is EventSpeed.COMBAT_ACTION
+
+    def is_fast_action(self) -> bool:
+        return self.event_speed is EventSpeed.FAST_ACTION
+
+    def make_fast_action(self) -> Self:
+        return replace(self, event_speed=EventSpeed.FAST_ACTION)
 
 @dataclass(frozen=True, kw_only=True)
 class CardPEvent(PreprocessableEvent):
