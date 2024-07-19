@@ -74,18 +74,11 @@ class TestAlbedo(unittest.TestCase):
         game_state = grant_all_thick_shield(game_state)
         game_state = add_dmg_listener(game_state, Pid.P1)
 
-        # test first plunge gets cost reduction
+        # test all swaps are fast action
         game_state = step_swap(game_state, Pid.P1, 3)
-        game_state = step_action(game_state, Pid.P2, EndRoundAction())
-        game_state = step_skill(
-            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 2})
-        )
-
-        # test second plunge doesn't get cost reduction
+        self.assertIs(game_state.waiting_for(), Pid.P1)
         game_state = step_swap(game_state, Pid.P1, 2)
-        game_state = step_skill(
-            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3})
-        )
+        self.assertIs(game_state.waiting_for(), Pid.P1)
 
         # test summon damage and usages behaves correctly
         game_state = remove_all_thick_shield(game_state)
@@ -101,41 +94,19 @@ class TestAlbedo(unittest.TestCase):
             last_summon_dmg.target,
             StaticTarget.from_player_active(game_state, Pid.P2),
         )
-
-        # test cost reduction usages refreshes next round
-        game_state = step_action(game_state, Pid.P2, EndRoundAction())
-        game_state = step_swap(game_state, Pid.P1, 3)
-        game_state = step_skill(
-            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 2})
-        )
-
-        # test non-plunge doesn't get reduction
-        game_state = next_round_with_great_omni(game_state)
-        game_state = step_action(game_state, Pid.P2, EndRoundAction())
-        assert SolarIsotomaSummon in game_state.player1.summons
-        game_state = step_skill(
-            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3})
-        )
-
-        # check summon usages decreases as expected
-        p1_summons = game_state.player1.summons
-        self.assertIn(SolarIsotomaSummon, p1_summons)
-        self.assertEqual(p1_summons.just_find(SolarIsotomaSummon).usages, 1)
-
-        # check summon disappears eventually
-        game_state = next_round(game_state)
-        p1_summons = game_state.player1.summons
-        self.assertNotIn(SolarIsotomaSummon, p1_summons)
+        solar_summon = p1_summons.just_find(SolarIsotomaSummon)
+        self.assertEqual(solar_summon.usages, 2)
 
     def test_talent_card(self):
         game_state = step_action(self.BASE_GAME, Pid.P1, CardAction(
             card=DescentOfDivinity,
             instruction=DiceOnlyInstruction(dice=ActualDice({Element.GEO: 3}))
         ))
+        game_state = grant_all_infinite_revival(game_state)
         game_state = step_action(game_state, Pid.P2, EndRoundAction())
         game_state = add_dmg_listener(game_state, Pid.P1)
 
-        # test plunge gets more damage
+        # test plunge gets more damage and cost reduction
         game_state = step_swap(game_state, Pid.P1, 3)
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 2})
@@ -145,17 +116,17 @@ class TestAlbedo(unittest.TestCase):
         self.assertEqual(dmg.damage, 3)
         self.assertEqual(dmg.target, StaticTarget.from_player_active(game_state, Pid.P2))
 
-        # test all plunges gets more damage
+        # test all plunges gets more damage and reduction
         game_state = step_swap(game_state, Pid.P1, 2)
         game_state = step_skill(
-            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3})
+            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 2})
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertIs(dmg.element, Element.PHYSICAL)
         self.assertEqual(dmg.damage, 3)
         self.assertEqual(dmg.target, StaticTarget.from_player_active(game_state, Pid.P2))
 
-        # test non-plunges doesn't get boost
+        # test non-plunges doesn't get boost and reduction
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3})
         )
@@ -164,3 +135,13 @@ class TestAlbedo(unittest.TestCase):
         self.assertEqual(dmg.damage, 2)
         self.assertEqual(dmg.target, StaticTarget.from_player_active(game_state, Pid.P2))
 
+        # test plunge with no summon gets no boost and reduction
+        game_state = step_swap(game_state, Pid.P1, 3)
+        game_state = RemoveSummonEffect(Pid.P1, SolarIsotomaSummon).execute(game_state)
+        game_state = step_skill(
+            game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3})
+        )
+        dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
+        self.assertIs(dmg.element, Element.PHYSICAL)
+        self.assertEqual(dmg.damage, 2)
+        self.assertEqual(dmg.target, StaticTarget.from_player_active(game_state, Pid.P2))

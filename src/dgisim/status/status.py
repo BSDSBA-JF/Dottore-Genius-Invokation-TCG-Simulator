@@ -651,10 +651,7 @@ class Status:
         )
 
     def _some_char_equiped_talent(
-            self,
-            game_state: GameState,
-            pid: Pid,
-            char_type: type[Character],
+            self, game_state: GameState, pid: Pid, char_type: type[Character],
     ) -> bool:
         alive_chars = game_state.get_player(pid).characters.get_alive_characters()
         return any(
@@ -662,6 +659,9 @@ class Status:
             for char in alive_chars
             if isinstance(char, char_type)
         )
+
+    def _player_can_plunge(self, game_state: GameState, pid: Pid) -> bool:
+        return game_state.get_player(pid).hidden_statuses.just_find(PlungeAttackStatus).can_plunge
 
     def perspective_view(self) -> Self:
         """
