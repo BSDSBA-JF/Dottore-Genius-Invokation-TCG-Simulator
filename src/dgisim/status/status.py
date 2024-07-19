@@ -4664,7 +4664,9 @@ class ChihayaburuStatus(CharacterHiddenStatus):
 
 @dataclass(frozen=True, kw_only=True)
 class MidareRanzanStatus(CharacterStatus, PrepareSkillStatus):
+    MAX_USAGES: ClassVar[int] = 1
     to_remove: bool = False
+    fast_swap_available: bool = True
     _ELEMENT: ClassVar[Element] = Element.ANEMO
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
         TriggeringSignal.ACT_PRE_SKILL,
@@ -4684,13 +4686,13 @@ class MidareRanzanStatus(CharacterStatus, PrepareSkillStatus):
                     and item.dmg.element is Element.PHYSICAL
             ):
                 return item.convert_element(self._ELEMENT), self
-        elif signal is Preprocessables.SWAP:
+        elif signal is Preprocessables.SWAP and self.fast_swap_available:
             assert isinstance(item, ActionPEvent) and item.event_type is EventType.SWAP
             if (
                     item.target == status_source
                     and item.is_combat_action()
             ):
-                return item.make_fast_action(), self
+                return item.make_fast_action(), replace(self, fast_swap_available=False)
         elif signal is Preprocessables.DMG_AMOUNT_PLUS:
             assert isinstance(item, DmgPEvent)
             if (

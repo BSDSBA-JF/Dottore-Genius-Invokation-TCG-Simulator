@@ -162,6 +162,28 @@ class TestKaedeharaKazuha(unittest.TestCase):
                 self.assertEqual(p1_burst_summon.curr_elem, elem)
                 self.assertEqual(p1_burst_summon.ready_elem, None)
 
+    def test_midare_ranzan_status(self):
+        base_state = AddCharacterStatusEffect(
+            target=StaticTarget.from_char_id(Pid.P1, 2),
+            status=MidareRanzanStatus,
+        ).execute(self.BASE_GAME)
+        base_state = silent_fast_swap(base_state, Pid.P1, 1)
+        # freeze Kazuha
+        base_state = apply_elemental_aura(base_state, Element.HYDRO, Pid.P1, char_id=2)
+        base_state = apply_elemental_aura(base_state, Element.CRYO, Pid.P1, char_id=2)
+
+        # check first swap will be fast swap
+        game_state = step_swap(base_state, Pid.P1, 2)
+        self.assertIs(game_state.waiting_for(), Pid.P1)
+
+        game_state = step_swap(game_state, Pid.P1, 1)
+        assert game_state.waiting_for() is Pid.P2
+        game_state = skip_action_round_until(game_state, Pid.P1)
+        
+        # check second or later swap will be normal swap
+        game_state = step_swap(game_state, Pid.P1, 2)
+        self.assertIs(game_state.waiting_for(), Pid.P2)
+
     def test_autumn_whirlwind_summon_update_on_character_swirl(self):
         base_game_state = self.BASE_GAME.factory().f_player1(
             lambda p1: p1.factory().f_summons(
