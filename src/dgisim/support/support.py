@@ -65,6 +65,7 @@ __all__ = [
     "TreasureSeekingSeelieSupport",
 
     ## Locations ##
+    "DawnWinerySupport",
     "KnightsOfFavoniusLibrarySupport",
     "LiyueHarborWharfSupport",
     "SumeruCitySupport",
@@ -983,13 +984,48 @@ class TreasureSeekingSeelieSupport(Support, stt._UsageLivingStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
+class DawnWinerySupport(Support, stt._UsageLivingStatus):
+    usages: int = 2
+    MAX_USAGES: ClassVar[int] = 2
+
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.SWAP_COST_OMNI and self.usages > 0:
+            assert isinstance(item, ActionPEvent)
+            if (
+                    item.source.pid is status_source.pid
+                    and item.event_type.is_swap()
+                    and item.dice_cost.can_cost_less_elem()
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(1)),
+                    replace(self, usages=self.usages - 1),
+                )
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
+            return [], replace(self, usages=self.MAX_USAGES)
+        return [], self
+
+
+
+@dataclass(frozen=True, kw_only=True)
 class KnightsOfFavoniusLibrarySupport(Support):
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.ROLL_CHANCES:

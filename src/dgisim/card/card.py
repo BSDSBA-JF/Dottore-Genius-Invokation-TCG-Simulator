@@ -201,6 +201,7 @@ __all__ = [
     "ParametricTransformer",
     "TreasureSeekingSeelie",
     ## Location ##
+    "DawnWinery",
     "KnightsOfFavoniusLibrary",
     "LiyueHarborWharf",
     "SumeruCity",
@@ -3801,6 +3802,11 @@ class TreasureSeekingSeelie(ItemCard):
 # >>>>>>>>>>>>>>>>>>>> Support Cards / Item Cards >>>>>>>>>>>>>>>>>>>>
 
 # <<<<<<<<<<<<<<<<<<<< Support Cards / Location Cards <<<<<<<<<<<<<<<<<<<<
+
+
+class DawnWinery(LocationCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 2})
+    _SUPPORT_STATUS = sp.DawnWinerySupport
 
 
 class KnightsOfFavoniusLibrary(LocationCard):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from itertools import chain
-from typing import Iterator, TYPE_CHECKING
+from typing import Iterator, TYPE_CHECKING, TypeVar
 
 from ..helper.quality_of_life import just
 from .support import Support
@@ -11,6 +11,8 @@ if TYPE_CHECKING:
 __all__ = [
     "Supports",
 ]
+
+__InputSupport = TypeVar("__InputSupport", bound=Support)
 
 class Supports:
     """
@@ -31,8 +33,11 @@ class Supports:
             if type(s) is support_type and s.sid == sid
         ), None)
 
-    def just_find(self, support_type: type[Support], sid: int) -> Support:
-        return just(self.find(support_type, sid))
+    def just_find(self, support_type: type[__InputSupport], sid: int) -> __InputSupport:
+        assert issubclass(support_type, Support)
+        support = self.find(support_type, sid)
+        assert isinstance(support, support_type)
+        return support
 
     def find_by_sid(self, sid: int) -> None | Support:
         return next((

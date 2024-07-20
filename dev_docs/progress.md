@@ -4,10 +4,10 @@ The basics for running the entire game are all implemented,
 all I need now is to implement each card and character.
 
 - [Implementation Progress](#implementation-progress)
-  - [Character (44/83 implemented)](#character-4483-implemented)
-  - [Card (169/283 implemented)](#card-169283-implemented)
+  - [Character (44/95 implemented)](#character-4495-implemented)
+  - [Card (170/334 implemented)](#card-170334-implemented)
 
-## Character (44/83 implemented)
+## Character (44/95 implemented)
 
 - [ ] Pyro:
   - [x] Bennett
@@ -62,9 +62,9 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [ ] Stonehide Lawachurl
 
-## Card (169/283 implemented)
+## Card (170/334 implemented)
 
-- [ ] Equipment Card (88/155):
+- [ ] Equipment Card (88/177):
   - [ ] Talent Card:
     - [x] Abyssal Mayhem Hydrospout
     - [x] Arataki Ichiban
@@ -166,7 +166,7 @@ all I need now is to implement each card and character.
     - [x] Vourukasha's Glow
     - [x] Wine-Stained Tricorne
     - [x] Witch's Scorching Hat
-- [ ] Support Card (23/51):
+- [ ] Support Card (24/56):
   - [ ] Companion Card:
     - [x] Chang the Ninth
     - [x] Chef Mao
@@ -192,6 +192,7 @@ all I need now is to implement each card and character.
     - [ ] Red Feather Fan
     - [x] Treasure-Seeking Seelie
   - [ ] Location Card:
+    - [x] Dawn Winery
     - [ ] Gandharva Ville
     - [ ] Golden House
     - [ ] Jade Chamber
@@ -203,7 +204,7 @@ all I need now is to implement each card and character.
     - [x] Tenshukaku
     - [x] Vanarana
     - [ ] Weeping Willow of the Lake
-- [ ] Event Card (58/77):
+- [ ] Event Card (58/101):
   - [ ] Talent Card:
     - [x] Absorbing Prism
     - [x] Kanten Senmyou Blessing

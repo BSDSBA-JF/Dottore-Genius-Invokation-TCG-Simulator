@@ -34,6 +34,8 @@
   - Support Cards:
     - Companion Cards:
       - Jeht
+    - Location Cards:
+      - Dawn Winery
   - Event Cards:
     - Other Cards:
       - Sunyata Flower
@@ -44,6 +46,7 @@
 - Applied version 4.5's balance patch
 - Applied version 4.6's balance patch
 - Applied version 4.7's balance patch
+- Applied version 4.8's balance patch
 - Improved encoding for enums in the game such that encoded state always use
   different ID for different enums of different type.
 - Renamed `EncodingPlan.code_for` to `EncodingPlan.encode_item`.
