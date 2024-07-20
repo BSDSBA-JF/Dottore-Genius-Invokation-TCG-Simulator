@@ -4665,7 +4665,6 @@ class ChihayaburuStatus(CharacterHiddenStatus):
 @dataclass(frozen=True, kw_only=True)
 class MidareRanzanStatus(CharacterStatus, PrepareSkillStatus):
     MAX_USAGES: ClassVar[int] = 1
-    to_remove: bool = False
     fast_swap_available: bool = True
     _ELEMENT: ClassVar[Element] = Element.ANEMO
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
@@ -4693,13 +4692,6 @@ class MidareRanzanStatus(CharacterStatus, PrepareSkillStatus):
                     and item.is_combat_action()
             ):
                 return item.make_fast_action(), replace(self, fast_swap_available=False)
-        elif signal is Preprocessables.DMG_AMOUNT_PLUS:
-            assert isinstance(item, DmgPEvent)
-            if (
-                    item.dmg.source == status_source
-                    and item.dmg.damage_type.direct_normal_attack()
-            ):
-                return item, replace(self, to_remove=True)
         return item, self
 
     @override
@@ -4707,8 +4699,10 @@ class MidareRanzanStatus(CharacterStatus, PrepareSkillStatus):
             self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
             detail: None | InformableEvent
     ) -> tuple[list[eft.Effect], None | Self]:
-        if signal is TriggeringSignal.POST_SKILL and self.to_remove:
-            return [], None
+        if signal is TriggeringSignal.POST_SKILL:
+            assert isinstance(detail, SkillIEvent)
+            if detail.source == source and detail.skill_type.is_skill1():
+                return [], None
         elif signal is TriggeringSignal.ACT_PRE_SKILL:
             return [eft.CastSkillEffect(
                 target=source,

@@ -2786,6 +2786,8 @@ class Lyney(Character):
         Element.PYRO: 3,
     })
 
+    _SKILL2_ACTUAL_TYPE = CharacterSkillType.NORMAL_ATTACK
+
     @override
     def _skill1(self, game_state: GameState, source: StaticTarget) -> tuple[eft.Effect, ...]:
         return normal_attack_template(

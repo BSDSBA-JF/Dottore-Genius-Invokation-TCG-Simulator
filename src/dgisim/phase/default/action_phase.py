@@ -109,10 +109,6 @@ class ActionPhase(ph.Phase):
             ),
             AllStatusTriggererEffect(
                 pid,
-                TriggeringSignal.POST_SKILL,
-            ),
-            AllStatusTriggererEffect(
-                pid,
                 TriggeringSignal.POST_ANY,
             ),
             TurnEndEffect(),
@@ -244,10 +240,6 @@ class ActionPhase(ph.Phase):
         ))
         new_effects.append(AllStatusTriggererEffect(
             pid,
-            TriggeringSignal.POST_SKILL,
-        ))
-        new_effects.append(AllStatusTriggererEffect(
-            pid,
             TriggeringSignal.POST_ANY,
         ))
         new_effects.append(TurnEndEffect())
@@ -334,11 +326,6 @@ class ActionPhase(ph.Phase):
             ))
         if not card_event.invalidated:
             new_effects += card.effects(game_state, pid, action.instruction)
-        if card.is_combat_action():
-            new_effects.append(AllStatusTriggererEffect(
-                pid,
-                TriggeringSignal.POST_SKILL,
-            ))
         new_effects.append(AllStatusTriggererEffect(
             pid,
             TriggeringSignal.POST_CARD,

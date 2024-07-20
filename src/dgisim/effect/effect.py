@@ -2193,8 +2193,18 @@ class CastSkillEffect(DirectEffect):
         effects = character.skill(game_state, self.target, self.skill)
         if not effects:  # pragma: no cover
             return game_state
+        effects_list = list(effects)
+        effects_list.append(AllStatusTriggererEffect(
+            pid=self.target.pid,
+            signal=TriggeringSignal.POST_SKILL,
+            detail=SkillIEvent(
+                source=self.target,
+                skill_type=self.skill,
+                skill_true_type=character.skill_actual_type(self.skill),
+            ),
+        ))
         return game_state.factory().f_effect_stack(
-            lambda es: es.push_many_fl(effects)
+            lambda es: es.push_many_fl(effects_list)
         ).build()
 
 
