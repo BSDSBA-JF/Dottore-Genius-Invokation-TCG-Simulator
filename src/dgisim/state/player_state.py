@@ -8,7 +8,7 @@ from ..character import character as chr
 from ..status import statuses as sts
 from ..support import support as sp
 
-from ..card.cards import Cards
+from ..card.cards import Cards, OrderedCards
 from ..character.characters import Characters
 from ..dice import ActualDice
 from ..helper.hashable_dict import HashableDict
@@ -45,7 +45,7 @@ class PlayerState:
         dice_reroll_chances: int,
         dice: ActualDice,
         hand_cards: Cards,
-        deck_cards: Cards,
+        deck_cards: OrderedCards,
         publicly_used_cards: Cards,
         publicly_gained_cards: Cards,
         initial_deck: Deck,
@@ -155,7 +155,7 @@ class PlayerState:
         return self._hand_cards
 
     @property
-    def deck_cards(self) -> Cards:
+    def deck_cards(self) -> OrderedCards:
         """ :returns: the deck cards that will be drawn in the future.  """
         return self._deck_cards
 
@@ -300,14 +300,14 @@ class PlayerState:
             supports=Supports((), mode.supports_limit()),
             dice=ActualDice({}),
             hand_cards=Cards({}),
-            deck_cards=Cards(Counter(selected_cards)),
+            deck_cards=OrderedCards(selected_cards),
             publicly_used_cards=Cards({}),
             publicly_gained_cards=Cards({}),
             initial_deck=deck,
         )
 
     @classmethod
-    def from_chars_cards(cls, mode: Mode, characters: Characters, cards: Cards) -> Self:
+    def from_chars_cards(cls, mode: Mode, characters: Characters, cards: OrderedCards) -> Self:
         """
         :returns: the initial state of a player under `mode` with `characters` and `cards`.
         """
@@ -356,7 +356,7 @@ class PlayerState:
             supports=Supports((), mode.supports_limit()),
             dice=ActualDice({}),
             hand_cards=Cards({}),
-            deck_cards=Cards(deck.cards),
+            deck_cards=OrderedCards.from_dict_unordered(deck.cards),
             publicly_used_cards=Cards({}),
             publicly_gained_cards=Cards({}),
             initial_deck=deck,
@@ -506,14 +506,14 @@ class PlayerStateFactory:
     def f_hand_cards(self, f: Callable[[Cards], Cards]) -> PlayerStateFactory:
         return self.hand_cards(f(self._hand_cards))
 
-    def deck_cards(self, cards: Cards) -> PlayerStateFactory:
+    def deck_cards(self, cards: OrderedCards) -> PlayerStateFactory:
         self._deck_cards = cards
         return self
 
-    def f_deck_cards(self, f: Callable[[Cards], Cards]) -> PlayerStateFactory:
+    def f_deck_cards(self, f: Callable[[OrderedCards], OrderedCards]) -> PlayerStateFactory:
         return self.deck_cards(f(self._deck_cards))
 
-    def both_deck_cards(self, cards: Cards) -> PlayerStateFactory:
+    def both_deck_cards(self, cards: OrderedCards) -> PlayerStateFactory:
         init_deck = self._initial_deck.to_mutable()
         init_deck.cards = cards.to_dict()
         return self.deck_cards(cards).initial_deck(init_deck)

@@ -1,7 +1,9 @@
 import unittest
 
+from collections import Counter
+
 from src.dgisim.card.card import *
-from src.dgisim.card.cards import Cards
+from src.dgisim.card.cards import Cards, OrderedCards
 from src.dgisim.character.character import *
 from src.dgisim.character.characters import Characters
 from src.dgisim.mode import DefaultMode
@@ -28,7 +30,7 @@ class TestPlayerState(unittest.TestCase):
         player_state = PlayerState.from_chars_cards(
             DefaultMode(),
             Characters.from_iterable([Keqing, RhodeiaOfLoch, Tighnari, Kaeya, Keqing]),
-            Cards({Starsigns: 1, MondstadtHashBrown: 6}),
+            OrderedCards.from_dict_unordered({Starsigns: 1, MondstadtHashBrown: 6}),
         )
         self.assertTrue(player_state.characters.num_characters(), 5)
         for i in range(1, 6):
@@ -39,12 +41,12 @@ class TestPlayerState(unittest.TestCase):
         player_state1 = PlayerState.from_chars_cards(
             DefaultMode(),
             Characters.from_iterable([Keqing, RhodeiaOfLoch, Tighnari, Kaeya, Keqing]),
-            Cards({Starsigns: 1, MondstadtHashBrown: 6}),
+            OrderedCards.from_dict_ordered({Starsigns: 1, MondstadtHashBrown: 6}),
         )
         player_state2 = PlayerState.from_chars_cards(
             DefaultMode(),
             Characters.from_iterable([Keqing, RhodeiaOfLoch, Tighnari, Kaeya, Keqing]),
-            Cards({Starsigns: 1, MondstadtHashBrown: 6}),
+            OrderedCards.from_dict_ordered({Starsigns: 1, MondstadtHashBrown: 6}),
         )
         player_state3 = player_state2.factory().card_redraw_chances(8848).build()
         assert player_state1._phase               == player_state2._phase

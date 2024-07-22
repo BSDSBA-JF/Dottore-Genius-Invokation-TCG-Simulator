@@ -149,7 +149,7 @@ class ChangTheNinthSupport(Support, stt._UsageLivingStatus):
             d_usages = 1 if self.activated else 0
             if self.usages + d_usages == self.MAX_USAGES:
                 return [
-                    eft.DrawRandomCardEffect(
+                    eft.DrawTopCardEffect(
                         pid=source.pid,
                         num=2,
                     ),
@@ -373,7 +373,7 @@ class LibenSupport(Support, stt._UsageLivingStatus):
             ], replace(self, usages=curr_size)
         elif signal is TriggeringSignal.ROUND_START and self.usages == self.MAX_USAGES:
             return [
-                eft.DrawRandomCardEffect(
+                eft.DrawTopCardEffect(
                     pid=source.pid,
                     num=2,
                 ),
@@ -624,7 +624,7 @@ class SetariaSupport(Support, stt._UsageStatus):
             hand_cards = game_state.get_player(source.pid).hand_cards
             if hand_cards.num_cards() == 0:
                 return [
-                    eft.DrawRandomCardEffect(
+                    eft.DrawTopCardEffect(
                         pid=source.pid,
                         num=1,
                     ),
@@ -973,7 +973,7 @@ class TreasureSeekingSeelieSupport(Support, stt._UsageLivingStatus):
         if signal is TriggeringSignal.POST_SKILL and self.triggered:
             if self.usages + 1 == self.MAX_USAGES:
                 return [
-                    eft.DrawRandomCardEffect(
+                    eft.DrawTopCardEffect(
                         pid=source.pid,
                         num=self.CARDS_DRAWN,
                     ),
@@ -1052,7 +1052,7 @@ class LiyueHarborWharfSupport(Support, stt._UsageStatus):
         if signal is TriggeringSignal.END_ROUND_CHECK_OUT:
             assert self.usages > 0
             return [
-                eft.DrawRandomCardEffect(
+                eft.DrawTopCardEffect(
                     pid=source.pid,
                     num=2,
                 ),

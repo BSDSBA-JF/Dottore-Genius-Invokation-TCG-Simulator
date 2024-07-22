@@ -9,7 +9,7 @@ class TestSetaria(unittest.TestCase):
                 Setaria: 2,
             })).deck_cards(Cards({
                 IHaventLostYet: 6,
-            })).build()
+            }).to_ordered_cards()).build()
         ).build()
 
         # post card play

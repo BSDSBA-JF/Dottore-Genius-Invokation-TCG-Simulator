@@ -28,7 +28,7 @@ class TestNatureAndWisdom(unittest.TestCase):
             }),
         )
         self.assertEqual(
-            game_state.player1.deck_cards,
+            game_state.player1.deck_cards.to_cards(),
             Cards({}),
         )
         game_state = replace_deck_cards(game_state, Pid.P1, Cards({
@@ -50,7 +50,7 @@ class TestNatureAndWisdom(unittest.TestCase):
             }),
         )
         self.assertEqual(
-            game_state.player1.deck_cards,
+            game_state.player1.deck_cards.to_cards(),
             Cards({
                 SweetMadame: 5,
             }),
@@ -80,7 +80,7 @@ class TestNatureAndWisdom(unittest.TestCase):
             }),
         )
         self.assertEqual(
-            game_state.player1.deck_cards,
+            game_state.player1.deck_cards.to_cards(),
             Cards({
                 SweetMadame: 3,
             }),

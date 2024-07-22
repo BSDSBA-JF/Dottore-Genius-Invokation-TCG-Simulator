@@ -1,5 +1,6 @@
 import unittest
 
+from src.dgisim.card.cards import OrderedCards
 from src.dgisim.character.character import * 
 from src.dgisim.character.characters import Characters
 from src.dgisim.dice import *
@@ -273,7 +274,7 @@ class TestDice(unittest.TestCase):
             Characters.from_iterable(
                 [AratakiItto, Klee, Keqing]
             ).factory().active_character_id(2).build(),
-            Cards({}),
+            OrderedCards(()),
         )
         keys = tuple(dice.readonly_dice_ordered(player_state).keys())
         expected_order = (

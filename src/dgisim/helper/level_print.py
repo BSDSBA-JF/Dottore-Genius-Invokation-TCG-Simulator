@@ -189,7 +189,7 @@ class GamePrinter:
         )
         board.insert_board_at_nextline(
             0,
-            GamePrinter._insert_str_str_dict("Deck Cards", player["Deck Cards"]),
+            GamePrinter._insert_str_list("Deck Cards", player["Deck Cards"]),
         )
         board.insert_board_at_nextline(
             0,

@@ -3,7 +3,9 @@ import random
 from collections import Counter, defaultdict
 from functools import cached_property
 from itertools import chain
-from typing import Iterator, TYPE_CHECKING
+from typing import Iterable, Iterator, Sequence, TYPE_CHECKING, TypeVar
+
+from typing_extensions import override
 
 from ..helper.hashable_dict import HashableDict
 
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "Cards",
+    "OrderedCards",
 ]
 
 
@@ -244,6 +247,9 @@ class Cards:
     def to_dict(self) -> dict[type[Card], int]:
         return dict(self._cards.items())
 
+    def to_ordered_cards(self) -> OrderedCards:
+        return OrderedCards(self.ordered_cards)
+
     def dict_str(self) -> dict:
         existing_cards = dict([
             (card.name(), str(num))
@@ -251,3 +257,279 @@ class Cards:
             if num != 0
         ])
         return existing_cards
+
+
+class OrderedCards:
+    """
+    A container for easy management of cards with order.
+    """
+    def __init__(self, cards: Iterable[type[Card]]) -> None:
+        """
+        :param cards: the cards ordered from bottom to top.
+        """
+        self._cards = tuple(cards)
+
+    @property
+    def cards(self) -> tuple[type[Card], ...]:
+        return self._cards
+
+    def peek(self) -> type[Card]:
+        """ :returns: the top card. """
+        return self._cards[-1]
+
+    def pick(self, n: int = 1) -> tuple[OrderedCards, OrderedCards]:
+        """ :returns: cards left and top n cards. """
+        n = min(len(self._cards), n)
+        if n == 0:
+            return (self, OrderedCards.from_empty())
+        return (
+            OrderedCards(self._cards[:-n]),
+            OrderedCards(self._cards[-n:])
+        )
+
+    def pick_random_of_type(self, n: int, card_type: type[Card]) -> tuple[OrderedCards, OrderedCards]:
+        """
+        Similar to `.pick()` but only select from cards of type `card_type`.
+        """
+        qualified_indices = [
+            i
+            for i, card in enumerate(self._cards)
+            if issubclass(card, card_type)
+        ]
+        n = min(len(qualified_indices), n)
+        if n == 0:
+            return (self, OrderedCards.from_empty())
+        picked_indices = set(random.sample(qualified_indices, k=n))
+        return (
+            OrderedCards([card for i, card in enumerate(self._cards) if i not in picked_indices]),
+            OrderedCards([card for i, card in enumerate(self._cards) if i in picked_indices]),
+        )
+
+    def switch_random_different(
+            self, cards_back: OrderedCards | Iterable[type[Card]] | Cards | dict[type[Card], int]
+    ) -> tuple[OrderedCards, OrderedCards]:
+        """
+        :returns: a tuple of [cards left, cards selected].
+
+        `cards_back` will be put back to the pool, and `self` should be the pool.
+        Put n cards back to the pool, and pick the same number of cards that are
+        as different as possible back.
+
+        As tested, cards back will be inserted back randomly, before picking
+        cards (that appear not in cards back) from top to bottom. If there are
+        insufficient cards, then pick from top to bottom the rest.
+        (credit: https://www.bilibili.com/opus/930507267481010228)
+        """
+        if isinstance(cards_back, dict):
+            cards_back = Cards(cards_back).to_ordered_cards()
+        elif isinstance(cards_back, Cards):
+            cards_back = cards_back.to_ordered_cards()
+        elif not isinstance(cards_back, OrderedCards):
+            cards_back = OrderedCards(cards_back)
+
+        num_to_pick = len(cards_back)
+        if num_to_pick == 0:
+            return self, OrderedCards(())
+        cards_to_avoid = set(cards_back._cards)
+        mixed_cards = _standard_insertions(self._cards, cards_back._cards)
+        indices_availabilities = [True] * len(mixed_cards)
+        indiced_cards = list(enumerate(mixed_cards))
+        # pick non-returned cards
+        for i, card in reversed(indiced_cards):
+            if card not in cards_to_avoid:
+                num_to_pick -= 1
+                indices_availabilities[i] = False
+                if num_to_pick == 0:
+                    break
+        # pick any top cards left
+        if num_to_pick > 0:
+            for i, card in reversed(indiced_cards):
+                if indices_availabilities[i]:
+                    num_to_pick -= 1
+                    indices_availabilities[i] = False
+                    if num_to_pick == 0:
+                        break
+        left_ones = [card for i, card in enumerate(mixed_cards) if indices_availabilities[i]]
+        picked_ones = [card for i, card in enumerate(mixed_cards) if not indices_availabilities[i]]
+        return OrderedCards(left_ones), OrderedCards(picked_ones)
+
+    def num_cards(self) -> int:
+        """ :returns: the number of cards. """
+        return len(self._cards)
+
+    def empty(self) -> bool:
+        """ :returns: ``True`` if there is no cards. """
+        return len(self._cards) == 0
+    
+    def not_empty(self) -> bool:
+        """ :returns: ``True`` if there are some cards. """
+        return len(self._cards) > 0
+
+    def contains(self, card: type[Card]) -> bool:
+        """
+        :returns: `True` if `card` can be found.
+
+        Note if there's at least one `OmniCard`, then `True` is always returned.
+        """
+        from .card import OmniCard
+        return any(
+            c is card or c is OmniCard
+            for c in self._cards
+        )
+
+    def __contains__(self, card: type[Card]) -> bool:
+        return self.contains(card)
+
+    def add(self, card: type[Card]) -> OrderedCards:
+        """ :returns: new cards with this card at top. """
+        return self + (card,)
+
+    def remove(self, card: type[Card]) -> OrderedCards:
+        """ :returns: new cards with the top most card passed in removed. """
+        for i, card in reversed(list(enumerate(self._cards))):
+            if card is card:
+                return OrderedCards(self._cards[:i] + self._cards[i + 1:])
+        return self
+
+    def remove_all(self, card: type[Card]) -> OrderedCards:
+        """
+        :returns: new cards with removal of all cards of exactly type `card`.
+        """
+        if card not in self._cards:
+            return self
+        return OrderedCards([c for c in self._cards if c is not card])
+
+    def extend(self, cards: OrderedCards | Iterable[type[Card]], limit: None | int = None) -> OrderedCards:
+        """
+        :returns: new cards with addition of `cards` at top, but discard some if exceeds limit.
+        """
+        if limit is not None:
+            if not isinstance(cards, OrderedCards):
+                cards = OrderedCards(cards)
+            _, cards = cards.pick(max(limit - len(self._cards), 0))
+        return self + cards
+
+    def hide_all(self) -> OrderedCards:
+        """
+        :returns: the hidden version of cards. (replace all by `OmniCard`)
+        """
+        from .card import OmniCard
+        return OrderedCards([OmniCard] * len(self._cards))
+
+    @property
+    def ordered_cards(self) -> tuple[type[Card], ...]:
+        return self._cards
+
+    def encoding(self, encoding_plan: EncodingPlan) -> list[int]:
+        ret_val = [encoding_plan.encode_item(card) for card in self._cards]
+        fillings = encoding_plan.CARDS_FIXED_LEN - len(ret_val)
+        if fillings < 0:
+            raise Exception(f"Too many cards: {len(self._cards)}")
+        for _ in range(fillings):
+            ret_val.append(0)
+        return ret_val
+
+    @classmethod
+    def decoding(cls, encoding: list[int], encoding_plan: EncodingPlan) -> None | OrderedCards:
+        cards: list[type[Card]] = []
+        for card_code in encoding:
+            if card_code == 0:
+                continue
+            card = encoding_plan.type_for(card_code)
+            if card is None or not issubclass(card, Card):
+                return None
+            cards.append(card)
+        return cls(cards)
+    
+    def __getitem__(self, card: type[Card]) -> int:
+        if "__getitem_cache" not in self.__dict__:
+            self.__getitem_cache = Counter(self._cards)
+        return self.__getitem_cache.get(card, 0)
+    
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, OrderedCards) and self._cards == other._cards
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(self._cards)
+
+    def __repr__(self) -> str:
+        return '{' + ", ".join(card.name() for card in self._cards) + '}'
+
+    def __iter__(self) -> Iterator[type[Card]]:
+        return iter(self._cards)
+
+    def to_dict(self) -> dict[type[Card], int]:
+        return Counter(self._cards)
+
+    def dict_str(self) -> list[str]:
+        return [card.name() for card in self._cards]
+
+    def to_cards(self) -> Cards:
+        return Cards(self.to_dict())
+
+    @classmethod
+    def from_empty(cls) -> OrderedCards:
+        return cls(())
+
+    @classmethod
+    def from_dict_unordered(cls, d: dict[type[Card], int]) -> OrderedCards:
+        cards = list(Counter(d).elements())
+        random.shuffle(cards)
+        return cls(cards)
+
+    @classmethod
+    def from_dict_ordered(cls, d: dict[type[Card], int]) -> OrderedCards:
+        return cls(Counter(d).elements())
+
+    def __add__(self, other: OrderedCards | Iterable[type[Card]]) -> OrderedCards:
+        if isinstance(other, OrderedCards):
+            return OrderedCards(self._cards + other._cards)
+        return OrderedCards(self._cards + tuple(other))
+
+    def __radd__(self, other: OrderedCards | Iterable[type[Card]]) -> OrderedCards:
+        if isinstance(other, OrderedCards):
+            return OrderedCards(other._cards + self._cards)
+        return OrderedCards(tuple(other) + self._cards)
+
+    def __len__(self) -> int:
+        return len(self._cards)
+
+
+__T = TypeVar("__T")
+
+
+def _ordered_random_mix(a: list[__T], b: list[__T]) -> list[__T]:
+    """
+    Achieves the effect of inserting each element of b into a randomly.
+    It is unlikely to be faster when len(b) is not too big.
+    """
+    random.shuffle(b)
+
+    i, j = 0, 0
+    lena, lenb = len(a), len(b)
+    c = []
+    for _ in range(lena + lenb):
+        if random.random() < lena / (lena + lenb):
+            c.append(a[i])
+            i += 1
+            lena -= 1
+        else:
+            c.append(b[j])
+            j += 1
+            lenb -= 1
+    return c
+
+
+def _standard_insertions(a: Sequence[__T], b: Sequence[__T]) -> list[__T]:
+    """
+    Achieves the effect of inserting each element of b into a randomly.
+    This performs the ordinary sequential random insertions. Faster when
+    len(b) is small.
+    """
+    c = list(a)
+    for n in b:
+        c.insert(random.randint(0, len(c)), n)
+    return c

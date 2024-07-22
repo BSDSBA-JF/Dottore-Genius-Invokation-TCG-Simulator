@@ -1825,7 +1825,7 @@ class FruitOfFulfillment(WeaponEquipmentCard):
             instruction: act.StaticTargetInstruction
     ) -> tuple[eft.Effect, ...]:
         return (
-            eft.DrawRandomCardEffect(
+            eft.DrawTopCardEffect(
                 pid=pid,
                 num=2,
             ),
@@ -2076,7 +2076,7 @@ class ShadowOfTheSandKing(ArtifactEquipmentCard):
             instruction: act.StaticTargetInstruction
     ) -> tuple[eft.Effect, ...]:
         return (
-            eft.DrawRandomCardEffect(
+            eft.DrawTopCardEffect(
                 pid=pid,
                 num=1,
             ),
@@ -2477,7 +2477,7 @@ class InEveryHouseAStove(EventCard, _DiceOnlyChoiceProvider, ArcaneLegendCard):
                 pid,
                 instruction,
             ) + (
-                eft.DrawRandomCardEffect(
+                eft.DrawTopCardEffect(
                     pid=pid,
                     num=cards_drawn,
                 ),
@@ -3240,7 +3240,7 @@ class NatureAndWisdom(EventCard, _DiceOnlyChoiceProvider):
     ) -> tuple[eft.Effect, ...]:
         assert isinstance(instruction, act.DiceOnlyInstruction)
         return (
-            eft.DrawRandomCardEffect(
+            eft.DrawTopCardEffect(
                 pid=Pid.P1,
                 num=1,
             ),
@@ -3364,7 +3364,7 @@ class Strategize(EventCard, _DiceOnlyChoiceProvider):
     ) -> tuple[eft.Effect, ...]:
         assert isinstance(instruction, act.DiceOnlyInstruction)
         return (
-            eft.DrawRandomCardEffect(
+            eft.DrawTopCardEffect(
                 pid=pid,
                 num=2,
             ),

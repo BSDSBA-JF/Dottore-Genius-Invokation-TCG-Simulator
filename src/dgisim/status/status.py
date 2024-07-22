@@ -2090,7 +2090,7 @@ class FlowingRingsStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
         if signal is TriggeringSignal.POST_SKILL and self.activated:
             assert self.usages > 0
             return [
-                eft.DrawRandomCardEffect(pid=source.pid, num=1),
+                eft.DrawTopCardEffect(pid=source.pid, num=1),
             ], replace(self, usages=-1, activated=False)
         elif signal is TriggeringSignal.ROUND_END and self.usages < 1:
             assert not self.activated
@@ -2179,7 +2179,7 @@ class _ShadowOfTheSandKingLikeStatus(ArtifactEquipmentStatus, _UsageLivingStatus
                     and detail.dmg.reaction is not None
             ):
                 return [
-                    eft.DrawRandomCardEffect(pid=source.pid, num=1),
+                    eft.DrawTopCardEffect(pid=source.pid, num=1),
                 ], replace(self, usages=-1)
         elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
             return [], replace(self, usages=self.MAX_USAGES)
@@ -2220,7 +2220,7 @@ class _HeartOfKhvarenasBrillianceLikeStatus(ArtifactEquipmentStatus, _UsageLivin
             ):
                 return [], self
             return [
-                eft.DrawRandomCardEffect(pid=source.pid, num=1),
+                eft.DrawTopCardEffect(pid=source.pid, num=1),
             ], replace(self, usages=-1)
         elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
             return [], replace(self, usages=self.MAX_USAGES)
@@ -3003,7 +3003,7 @@ class StoneAndContractsStatus(CombatStatus):
                     element=Element.OMNI,
                     num=3,
                 ),
-                eft.DrawRandomCardEffect(
+                eft.DrawTopCardEffect(
                     pid=source.pid,
                     num=1,
                 ),
@@ -5259,7 +5259,7 @@ class ShootingStarStatus(CombatStatus, _UsageLivingStatus):
                 ))
                 layla = game_state.get_player(source.pid).characters.find_first_character(Layla)
                 if layla is not None and layla.talent_equipped():
-                    effects.append(eft.DrawRandomCardEffect(
+                    effects.append(eft.DrawTopCardEffect(
                         pid=source.pid,
                         num=1,
                     ))
@@ -6910,7 +6910,7 @@ class BreakthroughStatus(CharacterStatus, _UsageLivingStatus):
         if signal is TriggeringSignal.POST_SKILL:
             if self.should_draw:
                 return [
-                    eft.DrawRandomCardEffect(pid=source.pid, num=1),
+                    eft.DrawTopCardEffect(pid=source.pid, num=1),
                 ], replace(self, usages=-2, should_draw=False)
             elif self.should_stack:
                 return [], replace(self, usages=2, should_stack=False)

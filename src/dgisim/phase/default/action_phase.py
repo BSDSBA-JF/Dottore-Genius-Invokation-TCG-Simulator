@@ -486,7 +486,7 @@ class ActionPhase(ph.Phase):
 
         player = game_state.get_player(pid)
         new_deck, new_picked = player.deck_cards.switch_random_different(action.selected_cards)
-        new_hand = player.hand_cards - action.selected_cards + new_picked
+        new_hand = player.hand_cards - action.selected_cards + new_picked.to_cards()
         new_redraw_chances: int = player.card_redraw_chances - 1
 
         if new_redraw_chances > 0:

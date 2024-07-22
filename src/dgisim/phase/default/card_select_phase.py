@@ -12,7 +12,7 @@ from ...state.enums import Pid, Act
 
 if TYPE_CHECKING:
     from ...action.types import DecidedChoiceType, GivenChoiceType
-    from ...card.cards import Cards
+    from ...card.cards import Cards, OrderedCards
     from ...state.game_state import GameState
     from ...state.player_state import PlayerState
 
@@ -30,7 +30,7 @@ class CardSelectPhase(ph.Phase):
         mode = game_state.mode
 
         from ...card.card import ArcaneLegendCard
-        def draw_random_cards(deck_cards: Cards) -> tuple[Cards, Cards]:
+        def draw_random_cards(deck_cards: OrderedCards) -> tuple[OrderedCards, OrderedCards]:
             """
             Draw some number of random cards, and prioritize Arcane Legend Cards.
             """
@@ -39,7 +39,7 @@ class CardSelectPhase(ph.Phase):
                 ArcaneLegendCard,
             )
             left_to_draw = mode.initial_cards_num() - arcane_cards.num_cards()
-            deck_cards, normal_cards = deck_cards.pick_random(left_to_draw)
+            deck_cards, normal_cards = deck_cards.pick(left_to_draw)
             return deck_cards, arcane_cards + normal_cards
 
         p1_deck, p1_hand = draw_random_cards(p1.deck_cards)
@@ -50,14 +50,14 @@ class CardSelectPhase(ph.Phase):
             .phase(Act.ACTION_PHASE)
             .card_redraw_chances(game_state.mode.card_redraw_chances())
             .deck_cards(p1_deck)
-            .hand_cards(p1_hand)
+            .hand_cards(p1_hand.to_cards())
             .build()
         ).f_player2(
             lambda p2: p2.factory()
             .phase(Act.ACTION_PHASE)
             .card_redraw_chances(game_state.mode.card_redraw_chances())
             .deck_cards(p2_deck)
-            .hand_cards(p2_hand)
+            .hand_cards(p2_hand.to_cards())
             .build()
         ).build()
 
@@ -84,7 +84,7 @@ class CardSelectPhase(ph.Phase):
     def _handle_card_drawing(self, game_state: GameState, pid: Pid, action: CardsSelectAction) -> GameState:
         player: PlayerState = game_state.get_player(pid)
         new_deck, new_picked = player.deck_cards.switch_random_different(action.selected_cards)
-        new_hand = player.hand_cards - action.selected_cards + new_picked
+        new_hand = player.hand_cards - action.selected_cards + new_picked.to_dict()
         new_redraw_chances: int = player.card_redraw_chances - 1
         new_player_phase: Act
         if new_redraw_chances > 0:

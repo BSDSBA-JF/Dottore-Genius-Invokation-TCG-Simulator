@@ -45,10 +45,10 @@ class TestChangTheNinth(unittest.TestCase):
         game_state = skip_action_round_until(game_state, Pid.P1)
         assert not game_state.player2.just_get_active_character().elemental_aura.has_aura()
         game_state = replace_character(game_state, Pid.P1, Ganyu, char_id=1)
-        old_deck_cards = game_state.player1.deck_cards
+        old_deck_cards = game_state.player1.deck_cards.to_cards()
         old_hand_cards = game_state.player1.hand_cards
         game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL3)
-        new_deck_cards = game_state.player1.deck_cards
+        new_deck_cards = game_state.player1.deck_cards.to_cards()
         new_hand_cards = game_state.player1.hand_cards
         optional_chang = game_state.player1.supports.find(ChangTheNinthSupport, 1)
         self.assertIsNone(optional_chang)

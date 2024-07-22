@@ -33,7 +33,7 @@ __SAMPLE_CARDS = Cards({
     TravelersHandySword: 2,
     GamblersEarrings: 2,
     TenacityOfTheMillelith: 2,
-})
+}).to_ordered_cards()
 
 
 BASE_GAME = GameState.from_default().factory().mode(

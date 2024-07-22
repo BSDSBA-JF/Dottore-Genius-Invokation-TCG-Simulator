@@ -8,7 +8,7 @@ class TestNRE(unittest.TestCase):
         base_state = ACTION_TEMPLATE
         base_state = base_state.factory().f_player1(
             lambda p1: p1.factory().deck_cards(
-                Cards.from_empty().add(SweetMadame).add(SweetMadame)
+                OrderedCards.from_empty().add(SweetMadame).add(SweetMadame)
             ).build()
         ).build()
         base_state = PublicAddCardEffect(Pid.P1, NRE).execute(base_state)

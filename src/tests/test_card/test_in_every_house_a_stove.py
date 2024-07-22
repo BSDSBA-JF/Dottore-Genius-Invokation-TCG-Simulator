@@ -35,12 +35,12 @@ class TestInEveryHouseAStove(unittest.TestCase):
         )
 
         # round 2 with 2 kinds of talent cards should not trigger
-        game_state = replace_entire_deck(base_state, Pid.P1, Cards({
-            InEveryHouseAStove: 1,
-            ThunderingPenance: 1,
-            ColdBloodedStrike: 1,
-            Paimon: 0x7fffffff,
-        })).factory().round(2).build()
+        game_state = replace_entire_deck(base_state, Pid.P1, OrderedCards((
+            InEveryHouseAStove,
+            ThunderingPenance,
+            ColdBloodedStrike,
+            Paimon, Paimon, Paimon,
+        ))).factory().round(2).build()
         game_state = step_action(game_state, Pid.P1, CardAction(
             card=InEveryHouseAStove,
             instruction=DiceOnlyInstruction(dice=ActualDice.from_empty()),

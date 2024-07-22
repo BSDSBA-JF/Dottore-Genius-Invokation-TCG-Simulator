@@ -7,7 +7,7 @@ from typing_extensions import Self
 from src.dgisim.action.action import *
 from src.dgisim.agents import *
 from src.dgisim.card.card import Card
-from src.dgisim.card.cards import Cards
+from src.dgisim.card.cards import Cards, OrderedCards
 from src.dgisim.character.character import Character
 from src.dgisim.character.characters import Characters
 from src.dgisim.character.enums import CharacterSkill
@@ -511,10 +511,12 @@ def replace_hand_cards(game_state: GameState, pid: Pid, cards: Cards) -> GameSta
     ).build()
 
 
-def replace_deck_cards(game_state: GameState, pid: Pid, cards: Cards) -> GameState:
+def replace_deck_cards(game_state: GameState, pid: Pid, cards: Cards | OrderedCards) -> GameState:
+    if isinstance(cards, Cards):
+        cards = cards.to_ordered_cards()
     return game_state.factory().f_player(
         pid,
-        lambda p: p.factory().deck_cards(cards).build()
+        lambda p: p.factory().deck_cards(cards).build()  # type: ignore
     ).build()
 
 def replace_init_deck(game_state: GameState, pid: Pid, cards: Cards) -> GameState:
@@ -526,14 +528,16 @@ def replace_init_deck(game_state: GameState, pid: Pid, cards: Cards) -> GameStat
         lambda p: p.factory().initial_deck(new_deck).build()
     ).build()
 
-def replace_entire_deck(game_state: GameState, pid: Pid, cards: Cards) -> GameState:
+def replace_entire_deck(game_state: GameState, pid: Pid, cards: Cards | OrderedCards) -> GameState:
     """ Changes both init deck and runtime deck. """
+    if isinstance(cards, Cards):
+        cards = cards.to_ordered_cards()
     new_deck: Deck = game_state.get_player(pid).initial_deck.to_mutable()
     new_deck.cards = cards.to_dict()
     new_deck = new_deck.to_frozen()
     return game_state.factory().f_player(
         pid,
-        lambda p: p.factory().deck_cards(cards).initial_deck(new_deck).build()
+        lambda p: p.factory().deck_cards(cards).initial_deck(new_deck).build()  # type: ignore
     ).build()
 
 def replace_character(

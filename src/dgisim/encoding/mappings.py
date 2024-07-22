@@ -533,7 +533,7 @@ EFFECT_MAPPING: dict[type["Effect"], int] = HashableDict({
         (effect.EnergyDrainEffect, 271),
 
         #### 4.4 Card Effect 280 ####
-        (effect.DrawRandomCardEffect, 280),
+        (effect.DrawTopCardEffect, 280),
         (effect.DrawRandomCardOfTypeEffect, 281),
         (effect.PublicAddCardEffect, 282),
         (effect.PublicRemoveCardEffect, 283),

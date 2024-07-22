@@ -58,11 +58,11 @@ class TestLiben(unittest.TestCase):
                 gsm.step_until_phase(game_state.mode.action_phase)
                 game_state = gsm.get_game_state()
                 pre_dice = game_state.player1.dice
-                pre_deck_cards = game_state.player1.deck_cards
+                pre_deck_cards = game_state.player1.deck_cards.to_cards()
                 pre_hand_cards = game_state.player1.hand_cards
                 game_state = auto_step(game_state)
                 post_dice = game_state.player1.dice
-                post_deck_cards = game_state.player1.deck_cards
+                post_deck_cards = game_state.player1.deck_cards.to_cards()
                 post_hand_cards = game_state.player1.hand_cards
 
                 if expected_fill == 3:
