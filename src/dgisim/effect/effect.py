@@ -1678,6 +1678,7 @@ class PrivateAddCardEffect(DirectEffect):
 
 @dataclass(frozen=True, repr=False)
 class AddDiceEffect(DirectEffect):
+    source: StaticTarget
     pid: Pid
     element: Element
     num: int

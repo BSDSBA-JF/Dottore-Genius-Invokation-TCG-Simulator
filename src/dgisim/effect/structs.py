@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, replace
 from typing import TYPE_CHECKING
 
 from typing_extensions import Self
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from ..card.card import Card
     from ..encoding.encoding_plan import EncodingPlan
     from ..state.game_state import GameState
+    from ..status.status import Status
     from ..summon.summon import Summon
 
 __all__ = [
@@ -24,6 +25,7 @@ class StaticTarget:
     pid: Pid
     zone: Zone
     id: int | type["Summon"] | type["Card"]
+    status: None | type["Status"] = None
 
     def encoding(self, encoding_plan: "EncodingPlan") -> list[int]:
         return [
@@ -54,6 +56,10 @@ class StaticTarget:
             zone,
             id,
         )
+
+    def with_status(self, status: type["Status"]) -> Self:
+        """ :returns: a new ``StaticTarget`` with the status ``status``. """
+        return replace(self, status=status)
 
     def __repr__(self) -> str:
         return dataclass_repr(self)

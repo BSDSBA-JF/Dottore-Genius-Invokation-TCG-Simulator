@@ -203,6 +203,7 @@ class ChefMaoSupport(Support, stt._UsageLivingStatus):
             assert self.usages > 0
             effects: list[eft.Effect] = [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=random.choice(tuple(PURE_ELEMENTS)),
                     num=1,
@@ -378,6 +379,7 @@ class LibenSupport(Support, stt._UsageLivingStatus):
                     num=2,
                 ),
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=Element.OMNI,
                     num=2,
@@ -549,6 +551,7 @@ class PaimonSupport(Support, stt._UsageStatus):
         if signal is TriggeringSignal.ROUND_START:
             return [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=Element.OMNI,
                     num=self.NUM_GENERATED,
@@ -596,6 +599,7 @@ class RanaSupport(Support, stt._UsageStatus):
             ).characters.get_nth_next_alive_character_in_activity_order(1)
             return [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=next_char.ELEMENT,
                     num=1,
@@ -930,6 +934,7 @@ class ParametricTransformerSupport(Support, stt._UsageLivingStatus):
                 )
                 return [
                     eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
                         pid=source.pid,
                         element=elem,
                         num=dice[elem],
@@ -1139,6 +1144,7 @@ class TenshukakuSupport(Support):
             if num_kinds >= self.MINIMAL_KINDS:
                 return [
                     eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
                         pid=source.pid,
                         element=Element.OMNI,
                         num=1,
@@ -1190,6 +1196,7 @@ class VanaranaSupport(Support):
             effects: list[eft.Effect] = []
             for elem in self.saved_dice:
                 effects.append(eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=elem,
                     num=self.saved_dice[elem],

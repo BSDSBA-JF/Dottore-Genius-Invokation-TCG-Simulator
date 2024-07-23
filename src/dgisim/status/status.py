@@ -1287,6 +1287,7 @@ class _SacrificialWeaponStatus(WeaponEquipmentStatus, _UsageLivingStatus):
                 assert equiper is not None
                 return [
                     eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
                         pid=source.pid,
                         element=equiper.ELEMENT,
                         num=self.DICE_GAIN_NUM,
@@ -2131,7 +2132,12 @@ class GamblersEarringsStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
                     and self._target_is_self_active(game_state, source)
             ):
                 return [
-                    eft.AddDiceEffect(pid=source.pid, element=Element.OMNI, num=self.DICE_GEN_NUM),
+                    eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
+                        pid=source.pid,
+                        element=Element.OMNI,
+                        num=self.DICE_GEN_NUM,
+                    ),
                 ], replace(self, usages=-1)
         return [], self
 
@@ -2293,6 +2299,7 @@ class InstructorsCapStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
             assert this_char is not None
             return [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=this_char.ELEMENT,
                     num=1,
@@ -2367,6 +2374,7 @@ class TenacityOfTheMillelithStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
             assert this_char is not None
             return [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=this_char.ELEMENT,
                     num=1,
@@ -3003,6 +3011,7 @@ class StoneAndContractsStatus(CombatStatus):
         if signal is TriggeringSignal.ROUND_START:
             return [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=Element.OMNI,
                     num=3,
@@ -3094,6 +3103,7 @@ class TheBoarPrincessStatus(CombatStatus, _UsageStatus):
             usable_usages = min(self.usages, self.triggered_num)
             return [
                 eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
                     pid=source.pid,
                     element=Element.OMNI,
                     num=usable_usages,

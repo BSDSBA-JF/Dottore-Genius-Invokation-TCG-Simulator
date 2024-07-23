@@ -2032,6 +2032,7 @@ class GildedDreams(ArtifactEquipmentCard):
         team_elems = game_state.get_player(instruction.target.pid).characters.all_elems()
         effects: list[eft.Effect] = [
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=instruction.target.pid,
                 element=attached_char.ELEMENT,
                 num=1 if len(team_elems) < 3 else 2,
@@ -2409,11 +2410,13 @@ class CovenantOfRock(EventCard, _DiceOnlyChoiceProvider, ArcaneLegendCard):
             instruction,
         ) + (
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=pid,
                 element=elem1,
                 num=1,
             ),
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=pid,
                 element=elem2,
                 num=1,
@@ -2845,7 +2848,12 @@ class ElementalResonanceImpetuousWinds(_ElementalResonanceCard, _CharTargetChoic
         assert isinstance(instruction, act.StaticTargetInstruction)
         return (
             eft.SwapCharacterEffect(target=instruction.target),
-            eft.AddDiceEffect(pid=pid, element=Element.OMNI, num=1),
+            eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
+                pid=pid,
+                element=Element.OMNI,
+                num=1,
+            ),
         )
 
 
@@ -2969,6 +2977,7 @@ class _ElementalResonanceDie(_ElementalResonanceCard, _DiceOnlyChoiceProvider):
     ) -> tuple[eft.Effect, ...]:
         return (
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=pid,
                 element=cls._ELEMENT,
                 num=cls._DICE_NUM,
@@ -3080,6 +3089,7 @@ class IHaventLostYet(EventCard, _DiceOnlyChoiceProvider):
         )
         return (
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=pid,
                 element=Element.OMNI,
                 num=1,
@@ -3427,6 +3437,7 @@ class TheBestestTravelCompanion(EventCard, _DiceOnlyChoiceProvider):
     ) -> tuple[eft.Effect, ...]:
         return (
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=pid,
                 element=Element.OMNI,
                 num=2,
@@ -3482,6 +3493,7 @@ class ThunderAndEternity(EventCard, _DiceOnlyChoiceProvider):
                 dice=dice,
             ),
             eft.AddDiceEffect(
+                source=StaticTarget.from_card(pid, cls),
                 pid=pid,
                 element=Element.OMNI,
                 num=dice.num_dice(),

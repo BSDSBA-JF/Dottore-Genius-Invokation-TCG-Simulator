@@ -26,6 +26,7 @@ from ..event import *
 from ..helper.quality_of_life import case_val
 from ..status.status_processing import StatusProcessing
 from ..status.enums import Preprocessables
+from ..status.status import Status
 from ..summon.summon import Summon
 from ..support.support import Support
 from .enums import Pid
@@ -284,11 +285,22 @@ class GameState:
         else:  # pragma: no cover
             return None
 
-    def get_target(self, target: StaticTarget) -> None | Character | Summon | Support:
+    def get_target(self, target: StaticTarget) -> None | Character | Status | Summon | Support:
         """ :returns: the target that `target` specifies. """
         player = self.get_player(target.pid)
         if target.zone is Zone.CHARACTERS:
-            return player.characters.get_character(cast(int, target.id))
+            char = player.characters.get_character(cast(int, target.id))
+            if target.status is None or char is None:
+                return char
+            else:
+                return next(
+                    (
+                        status
+                        for status in char.get_all_statuses_ordered_flattened()
+                        if isinstance(status, target.status)
+                    ),
+                    None,
+                )
         elif target.zone is Zone.SUMMONS:
             return player.summons.find(cast(type[Summon], target.id))
         elif target.zone is Zone.SUPPORTS:
