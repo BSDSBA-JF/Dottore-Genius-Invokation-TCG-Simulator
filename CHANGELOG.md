@@ -16,6 +16,7 @@
   - Layla
   - Lisa
   - Lyney
+  - Stonehide Lawachurl
   - Yaoyao
   - Yelan
 - New Cards:
@@ -28,6 +29,7 @@
       - Pulsating Witch
       - Shaken, Not Purred
       - Steady Breathing
+      - Stonehide Reforged
       - Turn Control
     - Artifact Cardso
       - Crown of Watatsumi

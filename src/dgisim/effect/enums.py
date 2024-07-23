@@ -65,6 +65,8 @@ class TriggeringSignal(Enum):
     REVIVAL_GAME_START = 19
     #: directly trigger a status
     DIRECT_TRIGGER = 20
+    #: triggers when some status is removed
+    POST_STATUS_REMOVAL = 21
 
 
 class DynamicCharacterTarget(Enum):

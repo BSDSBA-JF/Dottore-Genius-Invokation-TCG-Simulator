@@ -1,7 +1,7 @@
 Available Characters
 ====================
 
-44 of 95 characters in Genius Invokation TCG are available in the simulator.
+45 of 95 characters in Genius Invokation TCG are available in the simulator.
 
 Pyro
 ------
@@ -74,3 +74,4 @@ Geo
 * Arataki Itto
 * Ningguang
 * Noelle
+* Stonehide Lawachurl

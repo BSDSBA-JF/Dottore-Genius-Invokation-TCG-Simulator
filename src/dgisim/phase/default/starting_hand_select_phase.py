@@ -74,9 +74,10 @@ class StartingHandSelectPhase(ph.Phase):
                 Act.END_PHASE
             ).build()
         ).f_effect_stack(
-            lambda es: es.push_one(
-               eft.SwapCharacterEffect(StaticTarget.from_char_id(pid, char_id))
-            )
+            lambda es: es.push_many_fl((
+               eft.SwapCharacterEffect(StaticTarget.from_char_id(pid, char_id)),
+               eft.EffectsGroupEndEffect(),
+            ))
         ).build()
 
     def step_action(

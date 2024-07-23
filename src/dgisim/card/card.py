@@ -280,6 +280,8 @@ __all__ = [
     "TamakushiCasket",
     ## Shenhe ##
     "MysticalAbandon",
+    ## Stonehide Lawachurl ##
+    "StonehideReforged",
     ## Tartaglia ##
     "AbyssalMayhemHydrospout",
     ## Tighnari ##
@@ -4114,9 +4116,8 @@ class LightningStiletto(TalentEventCard, _CombatActionCard, _DiceOnlyChoiceProvi
         target = cls.implicit_target(game_state, pid)
         assert target is not None
         return (
-            eft.SwapCharacterEffect(
-                target=target,
-            ),
+            eft.SwapCharacterEffect(target=target),
+            eft.EffectsGroupEndEffect(),
             eft.OverrideCharacterStatusEffect(
                 target=target,
                 status=stt.KeqingTalentStatus(can_infuse=True),
@@ -4291,6 +4292,15 @@ class MysticalAbandon(_TalentEquipmentSkillCard):
     _CHARACTER = chr.Shenhe
     _EQUIPMENT_STATUS = stt.MysticalAbandonStatus
     _SKILL = CharacterSkill.SKILL2
+
+
+#### Stonehide Lawachurl ####
+
+class StonehideReforged(_TalentEquipmentSkillCard):
+    _DICE_COST = AbstractDice({Element.GEO: 4})
+    _CHARACTER = chr.StonehideLawachurl
+    _EQUIPMENT_STATUS = stt.StonehideReforgedStatus
+    _SKILL = CharacterSkill.ELEMENTAL_BURST
 
 
 #### Tartaglia ####

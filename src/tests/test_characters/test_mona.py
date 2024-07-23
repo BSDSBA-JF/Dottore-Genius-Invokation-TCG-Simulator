@@ -188,10 +188,7 @@ class TestMona(unittest.TestCase):
         self.assertNotIn(IllusoryBubbleStatus, game_state.player1.combat_statuses)
 
         # with reaction (Electro x Cryo)
-        game_state = SwapCharacterEffect(
-            StaticTarget(Pid.P1, Zone.CHARACTERS, 3)
-        ).execute(base_game)
-        game_state = auto_step(game_state)
+        game_state = step_swap(base_game, Pid.P1, 3)
         assert isinstance(game_state.player1.just_get_active_character(), Keqing)
         game_state = oppo_aura_elem(game_state, Element.CRYO)
         game_state = step_action(game_state, Pid.P1, SkillAction(
@@ -301,10 +298,7 @@ class TestMona(unittest.TestCase):
         )
 
         # test not working if Mona is off field
-        game_state = SwapCharacterEffect(
-            StaticTarget(Pid.P1, Zone.CHARACTERS, 3)
-        ).execute(base_game)
-        game_state = auto_step(game_state)
+        game_state = step_swap(base_game, Pid.P1, 3)
         assert isinstance(game_state.player1.just_get_active_character(), Keqing)
         game_state = oppo_aura_elem(game_state, Element.HYDRO)
         game_state = step_action(game_state, Pid.P1, SkillAction(

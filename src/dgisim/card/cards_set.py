@@ -39,6 +39,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     StalwartAndTrue,
     SteadyBreathing,
     StellarPredator,
+    StonehideReforged,
     StrategicReserve,
     StreamingSurge,
     SunyataFlower,

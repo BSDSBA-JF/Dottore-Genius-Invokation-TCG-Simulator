@@ -88,6 +88,7 @@ __all__ = [
     # Broadcast Effect
     "BroadcastDamageEffect",
     "BroadcastHealingEffect",
+    "BroadcastStatusRemovalEffect",
     "BroadcastSwapEffect",
 
     # Direct Effect
@@ -851,6 +852,22 @@ class BroadcastHealingEffect(BroadcastEffect):
 
 
 @dataclass(frozen=True, repr=False)
+class BroadcastStatusRemovalEffect(BroadcastEffect):
+    target: StaticTarget
+    status: type[stt.Status]
+
+    def execute(self, game_state: GameState) -> GameState:
+        return AllStatusTriggererEffect(
+            pid=self.target.pid,
+            signal=TriggeringSignal.POST_STATUS_REMOVAL,
+            detail=StatusRemovalIEvent(
+                target=self.target,
+                status=self.status,
+            ),
+        ).execute(game_state)
+
+
+@dataclass(frozen=True, repr=False)
 class BroadcastSwapEffect(BroadcastEffect):
     home_pid: Pid  # the player that should be broadcasted first
     source: StaticTarget
@@ -894,22 +911,30 @@ class SwapCharacterEffect(DirectEffect):
         if active_character is not None and active_character.id == self.target.id:
             return game_state
 
-        effects: list[Effect] = [
-            BroadcastSwapEffect(
-                home_pid=pid,
-                source=StaticTarget.from_char_id(pid, 
-                    0 if active_character is None else active_character.id
-                ),
-                target=self.target,
-            ),
-        ]
+        # effects: list[Effect] = [
+        #     BroadcastSwapEffect(
+        #         home_pid=pid,
+        #         source=StaticTarget.from_char_id(pid, 
+        #             0 if active_character is None else active_character.id
+        #         ),
+        #         target=self.target,
+        #     ),
+        # ]
         return game_state.factory().f_player(
             pid,
             lambda p: p.factory().f_characters(
                 lambda cs: cs.factory().active_character_id(cast(int, self.target.id)).build()
             ).build()
-        ).f_effect_stack(
-            lambda es: es.push_many_fl(effects)
+        # ).f_effect_stack(
+        #     lambda es: es.push_many_fl(effects)
+        ).f_common_effect_stack(
+            lambda es: es.push_left(BroadcastSwapEffect(
+                home_pid=self.target.pid,
+                source=StaticTarget.from_char_id(pid,
+                    cast(int, self.target.id) if active_character is None else active_character.id
+                ),
+                target=StaticTarget.from_char_id(self.target.pid, self.target.id),  # type: ignore
+            ))
         ).build()
 
 
@@ -1793,6 +1818,11 @@ class RemoveCharacterStatusEffect(DirectEffect):
             lambda p: p.factory().f_characters(
                 lambda cs: cs.factory().character(new_character).build()
             ).build()
+        ).f_common_effect_stack(
+            lambda es: es.push_one(BroadcastStatusRemovalEffect(
+                self.target,
+                self.status,
+            ))
         ).build()
 
 

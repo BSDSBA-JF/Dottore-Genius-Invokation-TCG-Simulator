@@ -56,53 +56,33 @@ class TestKaeya(unittest.TestCase):
 
     def test_elemental_burst(self):
         a1, a2 = PuppetAgent(), PuppetAgent()
-        base_game = self.BASE_GAME.factory().f_player1(
-            lambda p: p.factory().f_characters(
-                lambda cs: cs.factory().f_active_character(
-                    lambda ac: ac.factory().energy(
-                        ac.max_energy
-                    ).build()
-                ).build()
-            ).build()
-        ).build()
+        base_game = recharge_energy_for_all(self.BASE_GAME)
 
         # test burst base damage
-        a1.inject_action(SkillAction(
-            skill=CharacterSkill.ELEMENTAL_BURST,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 4})),
-        ))
-        gsm = GameStateMachine(base_game, a1, a2)
-        gsm.player_step()
-        gsm.auto_step()
-        game_state = gsm.get_game_state()
+        game_state = step_skill(
+            base_game, Pid.P1, CharacterSkill.ELEMENTAL_BURST,
+            ActualDice({Element.CRYO: 4}),
+        )
         p2ac = game_state.player2.just_get_active_character()
         p1 = game_state.player1
         self.assertEqual(p2ac.hp, 9)
-        self.assertTrue(p2ac.elemental_aura.contains(Element.CRYO))
+        self.assertIn(Element.CRYO, p2ac.elemental_aura)
         self.assertEqual(
             p1.combat_statuses.just_find(IcicleStatus).usages,
             3
         )
 
         # test normal swap cause usage of burst
-        game_state_p1_move = game_state.factory().f_player1(
-            lambda p: p.factory().f_hand_cards(
-                lambda hcs: hcs.add(LightningStiletto)
-            ).build()
-        ).player2(
-            self.BASE_GAME.player2.factory().f_combat_statuses(
-                lambda cs: cs.update_status(IcicleStatus())
-            ).build()
-        ).build()
+        game_state_p1_move = replace_hand_cards(
+            game_state, Pid.P1, Cards({LightningStiletto: 1})
+        )
+        game_state_p1_move = AddCombatStatusEffect(
+            Pid.P2, IcicleStatus
+        ).execute(game_state_p1_move)
+        game_state_p1_move = remove_aura(game_state_p1_move, Pid.P2)
+        game_state_p1_move = heal_for_all(game_state_p1_move)
 
-        a1.inject_action(SwapAction(
-            char_id=1,
-            instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 1})),
-        ))
-        gsm = GameStateMachine(game_state_p1_move, a1, a2)
-        gsm.player_step()
-        gsm.auto_step()
-        game_state = gsm.get_game_state()
+        game_state = step_swap(game_state_p1_move, Pid.P1, 1)
         p1 = game_state.player1
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 8)

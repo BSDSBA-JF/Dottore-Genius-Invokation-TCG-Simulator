@@ -35,6 +35,7 @@ class _ClassProperty:
 
 
 def classproperty(func) -> _ClassProperty:
+    """ This version of classproperty cache the first result. """
     # credit: https://stackoverflow.com/a/5191224
     if not isinstance(func, classmethod):
         func = classmethod(func)

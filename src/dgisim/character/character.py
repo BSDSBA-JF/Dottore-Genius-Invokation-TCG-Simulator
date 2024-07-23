@@ -68,6 +68,7 @@ __all__ = [
     "RhodeiaOfLoch",
     "SangonomiyaKokomi",
     "Shenhe",
+    "StonehideLawachurl",
     "Tartaglia",
     "Tighnari",
     "Venti",
@@ -3908,7 +3909,7 @@ class StonehideLawachurl(Character):
             energy=0,
             max_energy=3,
             hiddens=stts.Statuses(()),
-            statuses=stts.Statuses((stt.InfusedStonehideStatus(), )),
+            statuses=stts.Statuses((stt.StonehideStatus(), stt.StoneForceStatus())),
             elemental_aura=ElementalAura.from_default(),
         )
 

@@ -42,6 +42,7 @@ _DEFAULT_CHARACTERS: list[type[Character]] = [
     RhodeiaOfLoch,
     SangonomiyaKokomi,
     Shenhe,
+    StonehideLawachurl,
     Tartaglia,
     Tighnari,
     Venti,

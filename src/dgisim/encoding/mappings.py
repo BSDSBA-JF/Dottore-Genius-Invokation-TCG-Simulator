@@ -119,7 +119,7 @@ CHAR_MAPPING: dict[type["Character"], int] = HashableDict({
         #### Geo 400 ####
         (char.Ningguang, 400),
         (char.Noelle, 401),
-        # (char.StonehideLawachurl, 402),
+        (char.StonehideLawachurl, 402),
         (char.AratakiItto, 403),
         # (char.Zhongli, 404),
         (char.Albedo, 405),
@@ -402,7 +402,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         #### 4.5 Geo 1325 ####
         (card.StrategicReserve, 1325),
         (card.IGotYourBack, 1326),
-        # StonehideLawachurl 1327
+        (card.StonehideReforged, 1327),
         (card.AratakiIchiban, 1328),
         # Zhongli 1329
         (card.DescentOfDivinity, 1330),
@@ -559,6 +559,7 @@ EFFECT_MAPPING: dict[type["Effect"], int] = HashableDict({
         (effect.BroadcastSwapEffect, 400),
         (effect.BroadcastDamageEffect, 401),
         (effect.BroadcastHealingEffect, 402),
+        (effect.BroadcastStatusRemovalEffect, 403),
         #### End 500 ####
     )
 })
@@ -845,6 +846,9 @@ STT_MAPPING: dict[type["Status"], int] = HashableDict({
         (status.FullPlateStatus, 8621),
         (status.SweepingTimeStatus, 8622),
         ## StonehideLawachurl 8640 ##
+        (status.StonehideReforgedStatus, 8640),
+        (status.StoneForceStatus, 8641),
+        (status.StonehideStatus, 8642),
         ## AratakiItto 8660 ##
         (status.AratakiIchibanStatus, 8660),
         (status.RagingOniKingStatus, 8661),

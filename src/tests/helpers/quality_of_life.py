@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import ClassVar, cast, Iterable
 
+import unittest
 from typing_extensions import Self
 
 from src.dgisim.action.action import *
@@ -779,6 +780,7 @@ def use_elemental_aura(
         ).build()
     ).build()
 
+
 def active_chars(game_state: GameState) -> tuple[Character, Character]:
     """ Returns the active characters of both players (1 & 2) """
     return (
@@ -786,24 +788,55 @@ def active_chars(game_state: GameState) -> tuple[Character, Character]:
         game_state.get_player(Pid.P2).just_get_active_character(),
     )
 
+
 def p1_active_char(game_state: GameState) -> Character:
     """ Returns the active character of player 1 """
     return game_state.get_player(Pid.P1).just_get_active_character()
+
 
 def p2_active_char(game_state: GameState) -> Character:
     """ Returns the active character of player 2 """
     return game_state.get_player(Pid.P2).just_get_active_character()
 
+
 def p1_chars(game_state: GameState) -> tuple[Character, ...]:
     """ Returns the characters of player 1 """
     return game_state.player1.characters.get_characters()
 
+
 def p2_chars(game_state: GameState) -> tuple[Character, ...]:
     """ Returns the characters of player 2 """
     return game_state.player2.characters.get_characters()
+
 
 def end_round(game_state: GameState, pid: Pid) -> GameState:
     """ End round for `pid` given they have not ended yet. """
     game_state = skip_action_round_until(game_state, pid)
     game_state = step_action(game_state, pid, EndRoundAction())
     return game_state
+
+
+def run_common_effects(game_state: GameState, observe: bool = False) -> GameState:
+    """ run all pending common effects """
+    game_state = EffectsGroupEndEffect().execute(game_state)
+    return auto_step(game_state, observe)
+
+
+def assert_last_dmg(
+        testbody: unittest.TestCase, game_state: GameState, pid: Pid,
+        last_index: int = 0,
+        source: None | StaticTarget = None,
+        target: None | StaticTarget = None,
+        amount: None | int = None,
+        elem: None | Element = None,
+) -> None:
+    dmgs = get_dmg_listener_data(game_state, pid)
+    dmg = dmgs[-(last_index + 1)]
+    if source is not None:
+        testbody.assertEqual(dmg.source, source)
+    if target is not None:
+        testbody.assertEqual(dmg.target, target)
+    if amount is not None:
+        testbody.assertEqual(dmg.damage, amount)
+    if elem is not None:
+        testbody.assertIs(dmg.element, elem)

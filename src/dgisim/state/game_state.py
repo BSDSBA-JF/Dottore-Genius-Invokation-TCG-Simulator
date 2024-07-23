@@ -488,7 +488,7 @@ class GameStateFactory:
         self._effect_stack = game_state.effect_stack
         self._common_effect_stack = game_state.common_effect_stack
         self._dmg_effect_stack = game_state.dmg_effect_stack
-        self._leathal_dmg_effect_stack = game_state.lethal_dmg_effect_stack
+        self._lethal_dmg_effect_stack = game_state.lethal_dmg_effect_stack
 
     def mode(self, new_mode: md.Mode) -> GameStateFactory:
         self._mode = new_mode
@@ -530,11 +530,11 @@ class GameStateFactory:
         return self.dmg_effect_stack(f(self._dmg_effect_stack))
     
     def lethal_dmg_effect_stack(self, lethal_dmg_effect_stack: EffectStack) -> GameStateFactory:
-        self._leathal_dmg_effect_stack = lethal_dmg_effect_stack
+        self._lethal_dmg_effect_stack = lethal_dmg_effect_stack
         return self
 
     def f_lethal_dmg_effect_stack(self, f: Callable[[EffectStack], EffectStack]) -> GameStateFactory:
-        return self.lethal_dmg_effect_stack(f(self._leathal_dmg_effect_stack))
+        return self.lethal_dmg_effect_stack(f(self._lethal_dmg_effect_stack))
 
     def active_player_id(self, pid: Pid) -> GameStateFactory:
         self._active_player = pid
@@ -595,7 +595,7 @@ class GameStateFactory:
             effect_stack=self._effect_stack,
             common_effect_stack=self._common_effect_stack,
             dmg_effect_stack=self._dmg_effect_stack,
-            lethal_dmg_effect_stack=self._leathal_dmg_effect_stack,
+            lethal_dmg_effect_stack=self._lethal_dmg_effect_stack,
             player1=self._player1,
             player2=self._player2,
         )

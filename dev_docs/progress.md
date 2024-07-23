@@ -4,10 +4,10 @@ The basics for running the entire game are all implemented,
 all I need now is to implement each card and character.
 
 - [Implementation Progress](#implementation-progress)
-  - [Character (44/95 implemented)](#character-4495-implemented)
-  - [Card (170/334 implemented)](#card-170334-implemented)
+  - [Character (45/95 implemented)](#character-4595-implemented)
+  - [Card (171/334 implemented)](#card-171334-implemented)
 
-## Character (44/95 implemented)
+## Character (45/95 implemented)
 
 - [ ] Pyro:
   - [x] Bennett
@@ -60,11 +60,11 @@ all I need now is to implement each card and character.
   - [x] Arataki Itto
   - [x] Ningguang
   - [x] Noelle
-  - [ ] Stonehide Lawachurl
+  - [x] Stonehide Lawachurl
 
-## Card (170/334 implemented)
+## Card (171/334 implemented)
 
-- [ ] Equipment Card (88/177):
+- [ ] Equipment Card (89/177):
   - [ ] Talent Card:
     - [x] Abyssal Mayhem Hydrospout
     - [x] Arataki Ichiban
@@ -96,6 +96,7 @@ all I need now is to implement each card and character.
     - [x] Stalwart and True
     - [x] Steady Breathing
     - [x] Stellar Predator
+    - [x] Stonehide Reforged
     - [x] Strategic Reserve
     - [x] Streaming Surge
     - [x] Tamakushi Casket

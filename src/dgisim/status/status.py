@@ -298,7 +298,9 @@ __all__ = [
     "IcyQuillStatus",
     "MysticalAbandonStatus",
     ## Stonehide Lawachurl ##
-    "InfusedStonehideStatus",
+    "StoneForceStatus",
+    "StonehideReforgedStatus",
+    "StonehideStatus",
     ## Tartaglia ##
     "AbyssalMayhemHydrospoutStatus",
     "MeleeStanceStatus",
@@ -318,6 +320,8 @@ __all__ = [
     "DescentStatus",
     "GalesOfReverieStatus",
     "WindfavoredStatus",
+    ## Xiangling ##
+    "PyronadoStatus",
     ## Xingqiu ##
     "RainSwordStatus",
     "RainbowBladeworkStatus",
@@ -3059,10 +3063,7 @@ class TheBoarPrincessStatus(CombatStatus, _UsageStatus):
 
     @override
     def _inform(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            info_type: Informables,
+            self, game_state: GameState, status_source: StaticTarget, info_type: Informables,
             information: InformableEvent,
     ) -> Self:
         if info_type is Informables.EQUIPMENT_DISCARDING:
@@ -6128,37 +6129,87 @@ class MysticalAbandonStatus(TalentEquipmentStatus):
 #### Stonehide Lawachurl ####
 
 @dataclass(frozen=True, kw_only=True)
-class InfusedStonehideStatus(CharacterStatus, FixedShieldStatus):
-    usages: int = 3
-    MAX_USAGES: ClassVar[int] = 3
-    SHIELD_AMOUNT: ClassVar[int] = 1
-    boosted: bool = False  # +1 DMG per round
+class StoneForceStatus(CharacterStatus):
+    boostable: bool = True  # +1 DMG per round
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.POST_STATUS_REMOVAL,
+        TriggeringSignal.ROUND_END,
     ))
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
-            signal: Preprocessables
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.DMG_AMOUNT_PLUS:
+        if signal is Preprocessables.DMG_AMOUNT_PLUS and self.boostable:
             assert isinstance(item, DmgPEvent)
             if not (
                     item.dmg.source == status_source
                     and item.dmg.damage_type.directly_from_character()
             ):
                 return item, self
-            new_self = self
+            return item.delta_damage(1), replace(self, boostable=False)
+        elif signal is Preprocessables.DMG_ELEMENT and self.boostable:
+            assert isinstance(item, DmgPEvent)
+            if not (
+                    item.dmg.source == status_source
+                    and item.dmg.damage_type.directly_from_character()
+            ):
+                return item, self
             if item.dmg.element is Element.PHYSICAL:
-                item = item.convert_element(Element.GEO)
-            if not self.boosted:
-                item = item.delta_damage(1)
-                new_self = replace(self, boosted=True)
-            return item, new_self
+                return item.convert_element(Element.GEO), self
         return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.POST_STATUS_REMOVAL:
+            assert isinstance(detail, StatusRemovalIEvent)
+            if detail.status is StonehideStatus and detail.target == source:
+                return [], None
+        elif signal is TriggeringSignal.ROUND_END and not self.boostable:
+            return [], replace(self, boostable=True)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class StonehideReforgedStatus(TalentEquipmentStatus):
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.POST_DMG,
+    ))
+
+    @classproperty
+    def CARD(cls) -> type[crd.TalentEquipmentCard]:
+        from ..card.card import StonehideReforged
+        return StonehideReforged
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.POST_DMG:
+            assert isinstance(detail, DmgIEvent)
+            if (
+                    detail.lethal
+                    and detail.dmg.source == source
+                    and detail.dmg.damage_type.directly_from_character()
+                    and detail.dmg.target.pid is source.pid.other
+            ):
+                return [
+                    eft.AddCharacterStatusEffect(source, StonehideStatus),
+                    eft.AddCharacterStatusEffect(source, StoneForceStatus),
+                ], self
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class StonehideStatus(CharacterStatus, FixedShieldStatus):
+    usages: int = 3
+    MAX_USAGES: ClassVar[int] = 3
+    SHIELD_AMOUNT: ClassVar[int] = 1
 
 
 #### Tartaglia ####
@@ -6651,6 +6702,37 @@ class WindfavoredStatus(CharacterStatus, _UsageStatus):
         return item, self
 
 
+#### Xiangling ####
+
+@dataclass(frozen=True, kw_only=True)
+class PyronadoStatus(CombatStatus, _UsageStatus):
+    usages: int = 2
+    MAX_USAGES: ClassVar[int] = 2
+    DMG_AMOUNT: ClassVar[int] = 2
+    DMG_ELEM: ClassVar[Element] = Element.PYRO
+
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.POST_SKILL,
+    ))
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.POST_SKILL:
+            assert isinstance(detail, SkillIEvent)
+            if detail.source.pid is source.pid:
+                return [eft.ReferredDamageEffect(
+                    source=source,
+                    target=DynamicCharacterTarget.OPPO_ACTIVE,
+                    element=self.DMG_ELEM,
+                    damage=self.DMG_AMOUNT,
+                    damage_type=DamageType(status=True),
+                )], replace(self, usages=-1)
+        return [], self
+
+
 #### Xingqiu ####
 
 
@@ -6664,9 +6746,7 @@ class RainSwordStatus(CombatStatus, FixedShieldStatus):
 
     @override
     def _triggering_condition(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
+            self, game_state: GameState, status_source: StaticTarget,
             damage: eft.SpecificDamageEffect
     ) -> bool:
         from ..character.character import Xingqiu
@@ -6697,10 +6777,7 @@ class RainbowBladeworkStatus(CombatStatus, _UsageStatus):
 
     @override
     def _inform(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            info_type: Informables,
+            self, game_state: GameState, status_source: StaticTarget, info_type: Informables,
             information: InformableEvent,
     ) -> Self:
         if (

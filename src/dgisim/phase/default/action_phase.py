@@ -234,15 +234,17 @@ class ActionPhase(ph.Phase):
                 target_pid=pid,
                 status=ChargedAttackStatus(can_charge=True),
             ))
-        new_effects.append(CastSkillEffect(
-            target=StaticTarget.from_char_id(pid, active_character.id),
-            skill=action.skill,
+        new_effects.extend((
+            CastSkillEffect(
+                target=StaticTarget.from_char_id(pid, active_character.id),
+                skill=action.skill,
+            ),
+            AllStatusTriggererEffect(
+                pid,
+                TriggeringSignal.POST_ANY,
+            ),
+            TurnEndEffect(),
         ))
-        new_effects.append(AllStatusTriggererEffect(
-            pid,
-            TriggeringSignal.POST_ANY,
-        ))
-        new_effects.append(TurnEndEffect())
         # Afterwards
         return game_state.factory().f_effect_stack(
             lambda es: es.push_many_fl(new_effects)
@@ -273,12 +275,10 @@ class ActionPhase(ph.Phase):
         # Add Effects
         active_character = player.characters.get_active_character()
         assert active_character is not None
-        new_effects.append(SwapCharacterEffect(
-            StaticTarget(pid, Zone.CHARACTERS, action.char_id)
-        ))
-        new_effects.append(AllStatusTriggererEffect(
-            pid=pid,
-            signal=TriggeringSignal.POST_ANY,
+        new_effects.extend((
+            SwapCharacterEffect(StaticTarget(pid, Zone.CHARACTERS, action.char_id)),
+            EffectsGroupEndEffect(),
+            AllStatusTriggererEffect(pid, TriggeringSignal.POST_ANY),
         ))
 
         if action_speed is EventSpeed.COMBAT_ACTION:
@@ -404,10 +404,8 @@ class ActionPhase(ph.Phase):
             SwapCharacterEffect(
                 StaticTarget(pid, Zone.CHARACTERS, action.char_id)
             ),
-            AllStatusTriggererEffect(
-                pid,
-                TriggeringSignal.POST_ANY,
-            ),
+            EffectsGroupEndEffect(),
+            AllStatusTriggererEffect(pid, TriggeringSignal.POST_ANY),
         ])
         return game_state.factory().effect_stack(
             effect_stack

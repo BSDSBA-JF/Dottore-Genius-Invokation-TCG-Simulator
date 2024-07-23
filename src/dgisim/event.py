@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from .dice import AbstractDice
     from .state.game_state import GameState
     from .state.enums import Pid
-    from .status.status import EquipmentStatus
+    from .status.status import EquipmentStatus, Status
 
 __all__ = [
     # enums
@@ -36,6 +36,7 @@ __all__ = [
     "HealingIEvent",
     "ReactionIEvent",
     "SkillIEvent",
+    "StatusRemovalIEvent",
     "SwapIEvent",
     "SupportRemovelIEvent",
 
@@ -150,6 +151,12 @@ class SkillIEvent(InformableEvent):
                 or isinstance(game_state.get_character_target(self.source), char_type)
             )
         )
+
+
+@dataclass(frozen=True, kw_only=True)
+class StatusRemovalIEvent(InformableEvent):
+    target: StaticTarget
+    status: type[Status]
 
 
 @dataclass(frozen=True, kw_only=True)
