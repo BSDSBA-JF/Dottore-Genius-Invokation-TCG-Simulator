@@ -5,7 +5,7 @@ all I need now is to implement each card and character.
 
 - [Implementation Progress](#implementation-progress)
   - [Character (45/95 implemented)](#character-4595-implemented)
-  - [Card (171/334 implemented)](#card-171334-implemented)
+  - [Card (172/334 implemented)](#card-172334-implemented)
 
 ## Character (45/95 implemented)
 
@@ -62,7 +62,7 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [x] Stonehide Lawachurl
 
-## Card (171/334 implemented)
+## Card (172/334 implemented)
 
 - [ ] Equipment Card (89/177):
   - [ ] Talent Card:
@@ -144,7 +144,7 @@ all I need now is to implement each card and character.
     - [x] Crimson Witch of Flames
     - [x] Crown of Watatsumi
     - [x] Deepwood Memories
-    - [ ] Echoes of an Offering
+    - [x] Echoes of an Offering
     - [ ] Emblem of Severed Fate
     - [ ] Exile's Circlet
     - [x] Flowing Rings

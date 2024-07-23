@@ -100,6 +100,7 @@ __all__ = [
     "CrimsonWitchOfFlames",
     "CrownOfWatatsumi",
     "DeepwoodMemories",
+    "EchoesOfAnOffering",
     "FlowingRings",
     "GamblersEarrings",
     "GeneralsAncientHelm",
@@ -1997,6 +1998,11 @@ class CrownOfWatatsumi(ArtifactEquipmentCard):
 class DeepwoodMemories(ArtifactEquipmentCard):
     _DICE_COST = AbstractDice({Element.OMNI: 2})
     ARTIFACT_STATUS = stt.DeepwoodMemoriesStatus
+
+
+class EchoesOfAnOffering(ArtifactEquipmentCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 2})
+    ARTIFACT_STATUS = stt.EchoesOfAnOfferingStatus
 
 
 class FlowingRings(ArtifactEquipmentCard):

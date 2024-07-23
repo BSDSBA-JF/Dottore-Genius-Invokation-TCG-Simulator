@@ -1,7 +1,7 @@
 Available Cards
 ===============
 
-171 of 334 cards in Genius Invokation TCG are available in the simulator.
+172 of 334 cards in Genius Invokation TCG are available in the simulator.
 (excluding character cards which are not counted as cards in ``dgisim``)
 
 Equipment Cards
@@ -56,6 +56,7 @@ Artifact Card
 * Crimson Witch of Flames
 * Crown of Watatsumi
 * Deepwood Memories
+* Echoes of an Offering
 * Flowing Rings
 * Gambler's Earrings
 * General's Ancient Helm

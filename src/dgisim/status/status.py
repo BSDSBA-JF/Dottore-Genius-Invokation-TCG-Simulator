@@ -104,6 +104,7 @@ __all__ = [
     "CrimsonWitchOfFlamesStatus",
     "CrownOfWatatsumiStatus",
     "DeepwoodMemoriesStatus",
+    "EchoesOfAnOfferingStatus",
     "FlowingRingsStatus",
     "GamblersEarringsStatus",
     "GeneralsAncientHelmStatus",
@@ -2055,6 +2056,55 @@ class DeepwoodMemoriesStatus(_ElementalDiscountSupplyStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
+class EchoesOfAnOfferingStatus(ArtifactEquipmentStatus):
+    normal_attack_effect: bool = True
+    skill_effect: bool = True
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.POST_SKILL,
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @classproperty
+    def CARD(cls) -> type[crd.ArtifactEquipmentCard]:
+        from ..card.card import EchoesOfAnOffering
+        return EchoesOfAnOffering
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.POST_SKILL:
+            assert isinstance(detail, SkillIEvent)
+            if detail.source != source or not (self.normal_attack_effect or self.skill_effect):
+                return [], self
+            player = game_state.get_player(source.pid)
+            effects: list[eft.Effect] = []
+            new_self = self
+            if self.skill_effect and player.dice.num_dice() <= player.hand_cards.num_cards():
+                effects.append(eft.AddDiceEffect(
+                    source=source.with_status(type(self)),
+                    pid=source.pid,
+                    element=player.characters.just_get_character(cast(int, source.id)).ELEMENT,
+                    num=1,
+                ))
+                new_self = replace(new_self, skill_effect=False)
+            if self.normal_attack_effect and detail.skill_true_type.is_normal_attack():
+                effects.append(eft.DrawTopCardEffect(
+                    pid=source.pid,
+                    num=1,
+                ))
+                new_self = replace(new_self, normal_attack_effect=False)
+            return effects, new_self
+        elif signal is TriggeringSignal.ROUND_END and not (self.normal_attack_effect and self.skill_effect):
+            return [], type(self)()
+        return [], self
+
+    def __str__(self) -> str:
+        return super().__str__() + f"({'O' if self.normal_attack_effect else 'X'}{'O' if self.skill_effect else 'X'})"
+
+
+@dataclass(frozen=True, kw_only=True)
 class FlowingRingsStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
     usages: int = 1
     activated: bool = False
@@ -2070,10 +2120,7 @@ class FlowingRingsStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
 
     @override
     def _inform(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            info_type: Informables,
+            self, game_state: GameState, status_source: StaticTarget, info_type: Informables,
             information: InformableEvent,
     ) -> Self:
         if info_type is Informables.POST_SKILL_USAGE:

@@ -33,6 +33,7 @@
       - Turn Control
     - Artifact Cardso
       - Crown of Watatsumi
+      - Echoes of an Offering
   - Support Cards:
     - Companion Cards:
       - Jeht

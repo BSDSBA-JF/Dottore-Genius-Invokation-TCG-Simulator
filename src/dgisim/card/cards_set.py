@@ -88,6 +88,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     CrimsonWitchOfFlames,
     CrownOfWatatsumi,
     DeepwoodMemories,
+    EchoesOfAnOffering,
     FlowingRings,
     GamblersEarrings,
     GeneralsAncientHelm,
