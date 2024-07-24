@@ -55,6 +55,7 @@ __all__ = [
     "RanaSupport",
     "SetariaSupport",
     "TimaeusSupport",
+    "TimmieSupport",
     "WagnerSupport",
     "XudongSupport",
     "YayoiNanatsukiSupport",
@@ -689,6 +690,38 @@ class TimaeusSupport(Support, stt._UsageLivingStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
+class TimmieSupport(Support, stt._UsageLivingStatus):
+    usages: int = 1
+    MAX_USAGES: ClassVar[int] = 3
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_START,
+    ))
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_START:
+            if self.usages + 1 == self.MAX_USAGES:
+                return [
+                    eft.DrawTopCardEffect(
+                        pid=source.pid,
+                        num=1,
+                    ),
+                    eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
+                        pid=source.pid,
+                        element=Element.OMNI,
+                        num=1,
+                    ),
+                ], None
+            else:
+                return [], replace(self, usages=1)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
 class WagnerSupport(Support, stt._UsageLivingStatus):
     usages: int = 2
     used: bool = False
@@ -699,10 +732,7 @@ class WagnerSupport(Support, stt._UsageLivingStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.CARD2:

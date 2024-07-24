@@ -5,7 +5,7 @@ from .common_imports import *
 SUPPORT = MementoLens
 SUPPORT_STATUS = MementoLensSupport
 
-def p1_support_status(game_state: GameState, sid: int = 1) -> MementoLensSupport:
+def p1_support_status(game_state: GameState, sid: int = 1) -> SUPPORT_STATUS:
     return game_state.player1.supports.just_find(SUPPORT_STATUS, sid)
 
 class TestMementoLens(unittest.TestCase):

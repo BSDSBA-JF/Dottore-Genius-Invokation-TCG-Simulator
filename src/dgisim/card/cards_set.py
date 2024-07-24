@@ -186,6 +186,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     Rana,
     Setaria,
     Timaeus,
+    Timmie,
     Wagner,
     Xudong,
     YayoiNanatsuki,

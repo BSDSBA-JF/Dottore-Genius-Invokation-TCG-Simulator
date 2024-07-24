@@ -41,6 +41,7 @@
   - Support Cards:
     - Companion Cards:
       - Jeht
+      - Timmie
     - Item Cards:
       - Memento Lens
     - Location Cards:

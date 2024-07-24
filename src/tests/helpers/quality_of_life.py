@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, replace
-from typing import ClassVar, cast, Iterable
+from typing import Callable, ClassVar, cast, Iterable
 
 import unittest
 from typing_extensions import Self
@@ -213,6 +213,44 @@ def auto_step(game_state: GameState, observe: bool = False) -> GameState:
         gsm.auto_step()
     else:  # pragma: no cover
         while gsm.get_game_state().waiting_for() is None:
+            gsm.one_step()
+            print(GamePrinter.dict_game_printer(gsm.get_game_state().dict_str()))
+            input(":> ")
+    return gsm.get_game_state()
+
+
+def auto_step_until(game_state: GameState, predicate: Callable[[GameState], bool], observe: bool = False) -> GameState:
+    """
+    Step the game state until the predicate is satisfied.
+    Note it is assumed that no smart player input is required before the predicate is satisfied.
+    """
+    gsm = GameStateMachine(game_state, LazyAgent(), LazyAgent())
+    if not observe:
+        gsm.step_until_holds(predicate)
+    else:  # pragma: no cover
+        while not predicate(gsm.get_game_state()):
+            gsm.one_step()
+            print(GamePrinter.dict_game_printer(gsm.get_game_state().dict_str()))
+            input(":> ")
+    return gsm.get_game_state()
+
+
+def auto_step_to_start_of_phase(game_state: GameState, phase: type[Phase], observe: bool = False) -> GameState:
+    """
+    Step the game state until the start of the phase.
+    Note it is assumed that no smart player input is required before the predicate is satisfied.
+    """
+    gsm = GameStateMachine(game_state, LazyAgent(), LazyAgent())
+    if not observe:
+        gsm.step_until_next_phase()
+        gsm.step_until_phase(phase)
+    else:
+        curr_phase = type(gsm.get_game_state().phase)
+        while isinstance(gsm.get_game_state().phase, curr_phase):
+            gsm.one_step()
+            print(GamePrinter.dict_game_printer(gsm.get_game_state().dict_str()))
+            input(":> ")
+        while not isinstance(gsm.get_game_state().phase, phase):
             gsm.one_step()
             print(GamePrinter.dict_game_printer(gsm.get_game_state().dict_str()))
             input(":> ")

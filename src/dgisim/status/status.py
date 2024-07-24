@@ -357,6 +357,8 @@ class Status:
     The set of signals the status may react to.
     This is used to improve the performance.
     """
+    _AUTO_REUSE_SAME_UPDATE: ClassVar[bool] = True
+    """ If `True`, then the status will reuse the same object if the update is equivalent. """
 
     def __init__(self) -> None:
         if type(self) is Status:  # pragma: no cover
@@ -591,15 +593,13 @@ class Status:
         return effects
 
     def _post_react_to_signal(
-            self,
-            game_state: GameState,
-            effects: list[eft.Effect],
-            new_status: None | Self,
-            source: StaticTarget,
-            signal: TriggeringSignal,
-            detail: None | InformableEvent,
+            self, game_state: GameState, effects: list[eft.Effect], new_status: None | Self,
+            source: StaticTarget, signal: TriggeringSignal, detail: None | InformableEvent,
     ) -> tuple[list[eft.Effect], None | Self]:
-        return effects, case_val(new_status == self, self, new_status)
+        if self._AUTO_REUSE_SAME_UPDATE:
+            return effects, case_val(new_status == self, self, new_status)
+        else:
+            return effects, new_status
 
     def _react_to_signal(
             self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
@@ -855,6 +855,8 @@ class _UsageStatus(Status):
     #: usages added when recreated
     REPEATED_USAGES: ClassVar[int | None] = None
     AUTO_DESTROY: ClassVar[bool] = True
+
+    _AUTO_REUSE_SAME_UPDATE: ClassVar[bool] = False
 
     @override
     def _post_preprocess(

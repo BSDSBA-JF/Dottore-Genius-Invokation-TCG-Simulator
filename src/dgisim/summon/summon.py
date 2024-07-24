@@ -112,14 +112,9 @@ class _DestroyOnNumSummon(Summon, stt._UsageStatus):
 class _DestoryOnEndNumSummon(Summon):
     @override
     def _post_react_to_signal(
-            self,
-            game_state: GameState,
-            effects: list[eft.Effect],
-            new_status: Optional[Self],
-            source: StaticTarget,
-            signal: TriggeringSignal,
-            detail: None | InformableEvent,
-    ) -> tuple[list[eft.Effect], Optional[Self]]:
+            self, game_state: GameState, effects: list[eft.Effect], new_status: None | Self,
+            source: StaticTarget, signal: TriggeringSignal, detail: None | InformableEvent,
+    ) -> tuple[list[eft.Effect], None | Self]:
         if new_status is None:
             return super()._post_react_to_signal(game_state, effects, new_status, source, signal, detail)
 

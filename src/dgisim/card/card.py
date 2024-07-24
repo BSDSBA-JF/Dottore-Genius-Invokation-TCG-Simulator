@@ -198,6 +198,7 @@ __all__ = [
     "Rana",
     "Setaria",
     "Timaeus",
+    "Timmie",
     "Wagner",
     "Xudong",
     "YayoiNanatsuki",
@@ -3784,6 +3785,11 @@ class Timaeus(CompanionCard):
                 card_type=ArtifactEquipmentCard,
             ),
         )
+
+
+class Timmie(CompanionCard):
+    _DICE_COST = AbstractDice.from_empty()
+    _SUPPORT_STATUS = sp.TimmieSupport
 
 
 class Wagner(CompanionCard):
