@@ -117,6 +117,7 @@ __all__ = [
     "LaurelCoronetStatus",
     "MaskOfSolitudeBasaltStatus",
     "OceanHuedClamStatus",
+    "OrnateKabutoStatus",
     "ShadowOfTheSandKingStatus",
     "ThunderSummonersCrownStatus",
     "ThunderingFuryStatus",
@@ -2150,11 +2151,33 @@ class ExilesCircletStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
-class EmblemOfSeveredFateStatus(ArtifactEquipmentStatus):
-    DMG_BOOST: ClassVar[int] = 2
+class _OrnateKabutoStatus(ArtifactEquipmentStatus):
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
         TriggeringSignal.POST_SKILL,
     ))
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.POST_SKILL:
+            assert isinstance(detail, SkillIEvent)
+            if (
+                    detail.source.pid is source.pid
+                    and detail.source.id != source.id
+                    and detail.skill_type.is_elemental_burst()
+            ):
+                return [eft.EnergyRechargeEffect(
+                    target=source,
+                    amount=1,
+                )], self
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class EmblemOfSeveredFateStatus(_OrnateKabutoStatus):
+    DMG_BOOST: ClassVar[int] = 2
 
     @cached_classproperty
     def CARD(cls) -> type[crd.ArtifactEquipmentCard]:
@@ -2174,24 +2197,6 @@ class EmblemOfSeveredFateStatus(ArtifactEquipmentStatus):
             ):
                 return item.delta_damage(self.DMG_BOOST), self
         return item, self
-
-    @override
-    def _react_to_signal(
-            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
-            detail: None | InformableEvent
-    ) -> tuple[list[eft.Effect], None | Self]:
-        if signal is TriggeringSignal.POST_SKILL:
-            assert isinstance(detail, SkillIEvent)
-            if (
-                    detail.source.pid is source.pid
-                    and detail.source.id != source.id
-                    and detail.skill_type.is_elemental_burst()
-            ):
-                return [eft.EnergyRechargeEffect(
-                    target=source,
-                    amount=1,
-                )], self
-        return [], self
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -2468,6 +2473,22 @@ class MaskOfSolitudeBasaltStatus(_ElementalDiscountStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
+class OceanHuedClamStatus(_CrownOfWatatsumiStatus):
+    @cached_classproperty
+    def CARD(cls) -> type[crd.OceanHuedClam]:
+        from ..card.card import OceanHuedClam
+        return OceanHuedClam
+
+
+@dataclass(frozen=True, kw_only=True)
+class OrnateKabutoStatus(_OrnateKabutoStatus):
+    @cached_classproperty
+    def CARD(cls) -> type[crd.OrnateKabuto]:
+        from ..card.card import OrnateKabuto
+        return OrnateKabuto
+
+
+@dataclass(frozen=True, kw_only=True)
 class ShadowOfTheSandKingStatus(_ShadowOfTheSandKingLikeStatus):
     usages: int = 1
     MAX_USAGES: ClassVar[int] = 1
@@ -2527,14 +2548,6 @@ class TenacityOfTheMillelithStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
         elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
             return [], replace(self, usages=self.MAX_USAGES)
         return [], self
-
-
-@dataclass(frozen=True, kw_only=True)
-class OceanHuedClamStatus(_CrownOfWatatsumiStatus):
-    @cached_classproperty
-    def CARD(cls) -> type[crd.OceanHuedClam]:
-        from ..card.card import OceanHuedClam
-        return OceanHuedClam
 
 
 @dataclass(frozen=True, kw_only=True)

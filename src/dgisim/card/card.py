@@ -113,6 +113,7 @@ __all__ = [
     "LaurelCoronet",
     "MaskOfSolitudeBasalt",
     "OceanHuedClam",
+    "OrnateKabuto",
     "ShadowOfTheSandKing",
     "TenacityOfTheMillelith",
     "ThunderSummonersCrown",
@@ -2101,6 +2102,11 @@ class OceanHuedClam(ArtifactEquipmentCard):
                 recovery=2,
             ),
         )
+
+
+class OrnateKabuto(ArtifactEquipmentCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 1})
+    ARTIFACT_STATUS = stt.OrnateKabutoStatus
 
 
 class ShadowOfTheSandKing(ArtifactEquipmentCard):

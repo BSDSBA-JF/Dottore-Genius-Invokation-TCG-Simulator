@@ -37,6 +37,7 @@
       - Emblem of Severed Fate
       - Exile's Circlet
       - Ocean-Hued Clam
+      - Ornate Kabuto
   - Support Cards:
     - Companion Cards:
       - Jeht
