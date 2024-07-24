@@ -35,6 +35,7 @@
       - Crown of Watatsumi
       - Echoes of an Offering
       - Emblem of Severed Fate
+      - Exile's Circlet
   - Support Cards:
     - Companion Cards:
       - Jeht

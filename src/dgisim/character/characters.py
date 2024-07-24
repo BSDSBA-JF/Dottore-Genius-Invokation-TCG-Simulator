@@ -179,6 +179,38 @@ class Characters:
             if char.is_alive()
         )
 
+    def get_required_chars(
+            self,
+            activity_order: bool = False,
+            alive: bool = False,
+            non_active: bool = False,
+    ) -> tuple[Character, ...]:
+        """
+        :param activity_order: characters needs to be in activity order.
+        :param alive: characters needs to be alive.
+        :param non_active: characters needs to be non-active.
+        :returns: characters as required by parameters.
+        """
+        chars = self._characters
+        if activity_order:
+            for i in range(len(chars)):
+                if chars[i].id == self._active_character_id:
+                    chars = chars[i:] + chars[:i]
+                    break
+        if alive:
+            chars = tuple([
+                char
+                for char in chars
+                if char.alive
+            ])
+        if non_active:
+            chars = tuple([
+                char
+                for char in chars
+                if char.id != self._active_character_id
+            ])
+        return chars
+
     def get_character(self, id: int) -> None | Character:
         """ :returns: character with `id`. `None` is returned if `id` is not found. """
         for character in self._characters:

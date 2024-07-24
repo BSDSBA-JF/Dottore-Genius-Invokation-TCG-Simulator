@@ -36,7 +36,7 @@ class _CachedClassProperty:
         return self._cache
 
 
-def cachedclassproperty(func) -> _CachedClassProperty:
+def cached_classproperty(func) -> _CachedClassProperty:
     if not isinstance(func, classmethod):
         func = classmethod(func)
 

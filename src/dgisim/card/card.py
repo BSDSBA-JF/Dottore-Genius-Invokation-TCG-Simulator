@@ -102,6 +102,7 @@ __all__ = [
     "DeepwoodMemories",
     "EchoesOfAnOffering",
     "EmblemOfSeveredFate",
+    "ExilesCirclet",
     "FlowingRings",
     "GamblersEarrings",
     "GeneralsAncientHelm",
@@ -2009,6 +2010,11 @@ class EchoesOfAnOffering(ArtifactEquipmentCard):
 class EmblemOfSeveredFate(ArtifactEquipmentCard):
     _DICE_COST = AbstractDice({Element.OMNI: 2})
     ARTIFACT_STATUS = stt.EmblemOfSeveredFateStatus
+
+
+class ExilesCirclet(ArtifactEquipmentCard):
+    _DICE_COST = AbstractDice({Element.ANY: 2})
+    ARTIFACT_STATUS = stt.ExilesCircletStatus
 
 
 class FlowingRings(ArtifactEquipmentCard):

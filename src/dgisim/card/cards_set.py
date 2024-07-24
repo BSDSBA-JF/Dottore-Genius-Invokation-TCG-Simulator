@@ -90,6 +90,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     DeepwoodMemories,
     EchoesOfAnOffering,
     EmblemOfSeveredFate,
+    ExilesCirclet,
     FlowingRings,
     GamblersEarrings,
     GeneralsAncientHelm,

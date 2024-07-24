@@ -1,7 +1,7 @@
 Available Cards
 ===============
 
-173 of 334 cards in Genius Invokation TCG are available in the simulator.
+174 of 334 cards in Genius Invokation TCG are available in the simulator.
 (excluding character cards which are not counted as cards in ``dgisim``)
 
 Equipment Cards
@@ -58,6 +58,7 @@ Artifact Card
 * Deepwood Memories
 * Echoes of an Offering
 * Emblem of Severed Fate
+* Exile's Circlet
 * Flowing Rings
 * Gambler's Earrings
 * General's Ancient Helm
