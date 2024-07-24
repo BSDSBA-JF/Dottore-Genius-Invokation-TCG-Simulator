@@ -40,7 +40,7 @@ class TestRaidenShogun(unittest.TestCase):
         game_state = add_dmg_listener(self.BASE_GAME, Pid.P1)
         game_state = EnergyRechargeEffect(
             target=StaticTarget.from_player_active(game_state, Pid.P1),
-            recharge=2,
+            amount=2,
         ).execute(game_state)
         game_state = step_skill(
             game_state,

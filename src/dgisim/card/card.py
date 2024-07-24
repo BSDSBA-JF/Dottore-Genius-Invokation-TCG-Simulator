@@ -101,6 +101,7 @@ __all__ = [
     "CrownOfWatatsumi",
     "DeepwoodMemories",
     "EchoesOfAnOffering",
+    "EmblemOfSeveredFate",
     "FlowingRings",
     "GamblersEarrings",
     "GeneralsAncientHelm",
@@ -2005,6 +2006,11 @@ class EchoesOfAnOffering(ArtifactEquipmentCard):
     ARTIFACT_STATUS = stt.EchoesOfAnOfferingStatus
 
 
+class EmblemOfSeveredFate(ArtifactEquipmentCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 2})
+    ARTIFACT_STATUS = stt.EmblemOfSeveredFateStatus
+
+
 class FlowingRings(ArtifactEquipmentCard):
     _DICE_COST = AbstractDice.from_empty()
     ARTIFACT_STATUS = stt.FlowingRingsStatus
@@ -2699,7 +2705,7 @@ class CalxsArts(EventCard, _DiceOnlyChoiceProvider):
                 target=StaticTarget(
                     Pid.P1, Zone.CHARACTERS, active_char_id
                 ),
-                recharge=sum(
+                amount=sum(
                     1 for char in none_active_chars if char.energy > 0),
             )
         )
@@ -3102,7 +3108,7 @@ class IHaventLostYet(EventCard, _DiceOnlyChoiceProvider):
             ),
             eft.EnergyRechargeEffect(
                 target=target,
-                recharge=1,
+                amount=1,
             ),
             eft.AddCombatStatusEffect(
                 target_pid=target.pid,

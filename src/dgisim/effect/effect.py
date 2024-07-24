@@ -1435,14 +1435,14 @@ class ReferredDamageEffect(DirectEffect):
 @dataclass(frozen=True, repr=False)
 class EnergyRechargeEffect(DirectEffect):
     target: StaticTarget
-    recharge: int
+    amount: int
 
     def execute(self, game_state: GameState) -> GameState:
         character = game_state.get_target(self.target)
         from ..character.character import Character
         if not isinstance(character, Character):  # pragma: no cover
             return game_state
-        energy = min(character.energy + self.recharge, character.max_energy)
+        energy = min(character.energy + self.amount, character.max_energy)
         if energy == character.energy:
             return game_state
         character = character.factory().energy(energy).build()

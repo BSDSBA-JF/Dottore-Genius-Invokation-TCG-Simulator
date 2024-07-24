@@ -23,7 +23,7 @@ from src.dgisim.game_state_machine import GameStateMachine
 from src.dgisim.helper.level_print import GamePrinter
 from src.dgisim.helper.quality_of_life import *
 from src.dgisim.phase import Phase
-from src.dgisim.state.enums import Pid
+from src.dgisim.state.enums import Act, Pid
 from src.dgisim.state.game_state import GameState
 from src.dgisim.state.player_state import PlayerState
 from src.dgisim.status.enums import *
@@ -830,6 +830,7 @@ def assert_last_dmg(
         amount: None | int = None,
         elem: None | Element = None,
 ) -> None:
+    """ checks the last damage dealt from the player """
     dmgs = get_dmg_listener_data(game_state, pid)
     dmg = dmgs[-(last_index + 1)]
     if source is not None:
@@ -840,3 +841,17 @@ def assert_last_dmg(
         testbody.assertEqual(dmg.damage, amount)
     if elem is not None:
         testbody.assertIs(dmg.element, elem)
+
+
+def reactivate_player(game_state: GameState, pid: Pid) -> GameState:
+    """
+    force the player which has declared end-of-round be active again, and skip to their turn
+    """
+    assert game_state.get_player(pid).in_end_phase()
+    return skip_action_round_until(
+        game_state.factory().f_player(
+            pid,
+            lambda p: p.factory().phase(Act.PASSIVE_WAIT_PHASE).build()
+        ).build(),
+        pid,
+    )

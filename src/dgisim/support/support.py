@@ -409,7 +409,7 @@ class LiuSuSupport(Support, stt._UsageStatus):
                 return [
                     eft.EnergyRechargeEffect(
                         target=StaticTarget.from_char_id(source.pid, active_char.id),
-                        recharge=1,
+                        amount=1,
                     )
                 ], replace(self, usages=-1, activated=False)
         elif signal is TriggeringSignal.ROUND_END and not self.activated:

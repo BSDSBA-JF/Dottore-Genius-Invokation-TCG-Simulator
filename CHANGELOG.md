@@ -34,6 +34,7 @@
     - Artifact Cardso
       - Crown of Watatsumi
       - Echoes of an Offering
+      - Emblem of Severed Fate
   - Support Cards:
     - Companion Cards:
       - Jeht

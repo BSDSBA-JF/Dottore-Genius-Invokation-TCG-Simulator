@@ -396,7 +396,7 @@ class Character:
             eft.AliveMarkCheckerEffect(),
             eft.EnergyRechargeEffect(
                 target=source,
-                recharge=1,
+                amount=1,
             ),
         )
 
@@ -425,7 +425,7 @@ class Character:
             eft.AliveMarkCheckerEffect(),
             eft.EnergyRechargeEffect(
                 target=source,
-                recharge=1,
+                amount=1,
             ),
         )
 
@@ -449,7 +449,7 @@ class Character:
             eft.AliveMarkCheckerEffect(),
             eft.EnergyRechargeEffect(
                 target=source,
-                recharge=1,
+                amount=1,
             ),
         )
 
@@ -1368,7 +1368,7 @@ class Eula(Character):
             post_effects.append(
                 eft.EnergyRechargeEffect(
                     target=source,
-                    recharge=1,
+                    amount=1,
                 )
             )
         return effects + tuple(post_effects)
@@ -3494,7 +3494,7 @@ class RaidenShogun(Character):
             effects.append(
                 eft.EnergyRechargeEffect(
                     target=StaticTarget.from_char_id(source.pid, char.id),
-                    recharge=2,
+                    amount=2,
                 ),
             )
         return tuple(effects)
@@ -4004,7 +4004,7 @@ class Tartaglia(Character):
             effects.extend((
                 eft.EnergyRechargeEffect(
                     target=source,
-                    recharge=2,
+                    amount=2,
                 ),
                 eft.RelativeAddCharacterStatusEffect(
                     source_pid=source.pid,
