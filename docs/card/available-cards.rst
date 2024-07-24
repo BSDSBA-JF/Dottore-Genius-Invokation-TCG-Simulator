@@ -1,7 +1,7 @@
 Available Cards
 ===============
 
-174 of 334 cards in Genius Invokation TCG are available in the simulator.
+175 of 334 cards in Genius Invokation TCG are available in the simulator.
 (excluding character cards which are not counted as cards in ``dgisim``)
 
 Equipment Cards
@@ -68,6 +68,7 @@ Artifact Card
 * Instructor's Cap
 * Laurel Coronet
 * Mask of Solitude Basalt
+* Ocean-Hued Clam
 * Shadow of the Sand King
 * Tenacity of the Millelith
 * Thunder Summoner's Crown

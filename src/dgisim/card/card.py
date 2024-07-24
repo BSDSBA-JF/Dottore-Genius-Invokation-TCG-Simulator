@@ -112,6 +112,7 @@ __all__ = [
     "InstructorsCap",
     "LaurelCoronet",
     "MaskOfSolitudeBasalt",
+    "OceanHuedClam",
     "ShadowOfTheSandKing",
     "TenacityOfTheMillelith",
     "ThunderSummonersCrown",
@@ -2084,6 +2085,24 @@ class MaskOfSolitudeBasalt(ArtifactEquipmentCard):
     ARTIFACT_STATUS = stt.MaskOfSolitudeBasaltStatus
 
 
+class OceanHuedClam(ArtifactEquipmentCard):
+    _DICE_COST = AbstractDice({Element.ANY: 3})
+    ARTIFACT_STATUS = stt.OceanHuedClamStatus
+
+    @override
+    @classmethod
+    def on_enter_effects(
+            cls, game_state: gs.GameState, pid: Pid, instruction: act.StaticTargetInstruction
+    ) -> tuple[eft.Effect, ...]:
+        return (
+            eft.RecoverHPEffect(
+                source=StaticTarget.from_personal_status(pid, cast(int, instruction.target.id), cls.ARTIFACT_STATUS),
+                target=StaticTarget.from_char_id(pid, cast(int, instruction.target.id)),
+                recovery=2,
+            ),
+        )
+
+
 class ShadowOfTheSandKing(ArtifactEquipmentCard):
     _DICE_COST = AbstractDice({Element.OMNI: 1})
     ARTIFACT_STATUS = stt.ShadowOfTheSandKingStatus
@@ -2091,10 +2110,7 @@ class ShadowOfTheSandKing(ArtifactEquipmentCard):
     @override
     @classmethod
     def on_enter_effects(
-            cls,
-            game_state: gs.GameState,
-            pid: Pid,
-            instruction: act.StaticTargetInstruction
+            cls, game_state: gs.GameState, pid: Pid, instruction: act.StaticTargetInstruction
     ) -> tuple[eft.Effect, ...]:
         return (
             eft.DrawTopCardEffect(

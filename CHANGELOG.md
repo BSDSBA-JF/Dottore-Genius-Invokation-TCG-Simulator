@@ -36,6 +36,7 @@
       - Echoes of an Offering
       - Emblem of Severed Fate
       - Exile's Circlet
+      - Ocean-Hued Clam
   - Support Cards:
     - Companion Cards:
       - Jeht

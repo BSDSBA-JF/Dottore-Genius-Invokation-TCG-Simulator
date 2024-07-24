@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..card.card import Card
     from ..encoding.encoding_plan import EncodingPlan
     from ..state.game_state import GameState
-    from ..status.status import Status
+    from ..status.status import Status, PersonalStatus
     from ..summon.summon import Summon
 
 __all__ = [
@@ -67,7 +67,7 @@ class StaticTarget:
     @classmethod
     def from_player_active(cls, game_state: "GameState", pid: Pid) -> Self:
         """
-        :returns: the static target for the player `pid` in `game_state`.
+        :returns: the static target for the player ``pid`` in ``game_state``.
         """
         return cls(
             pid,
@@ -78,21 +78,28 @@ class StaticTarget:
     @classmethod
     def from_char_id(cls, pid: Pid, char_id: int) -> Self:
         """
-        :returns: the static target for character with `char_id` of player `pid`.
+        :returns: the static target for character with ``char_id`` of player ``pid``.
         """
         return cls(pid, Zone.CHARACTERS, char_id)
 
     @classmethod
+    def from_personal_status(cls, pid: Pid, char_id: int, status: type["PersonalStatus"]) -> Self:
+        """
+        :returns: the static target for ``status`` of character ``char_id``.
+        """
+        return cls(pid, Zone.CHARACTERS, char_id, status)
+
+    @classmethod
     def from_summon(cls, pid: Pid, summon: type["Summon"]) -> Self:
         """
-        :returns: the static target for `summon` of player `pid`.
+        :returns: the static target for ``summon`` of player ``pid``.
         """
         return cls(pid, Zone.SUMMONS, summon)
 
     @classmethod
     def from_support(cls, pid: Pid, sid: int) -> Self:
         """
-        :returns: the static target for support with `sid` of player `pid`.
+        :returns: the static target for support with ``sid`` of player ``pid``.
         """
         return cls(pid, Zone.SUPPORTS, sid)
 

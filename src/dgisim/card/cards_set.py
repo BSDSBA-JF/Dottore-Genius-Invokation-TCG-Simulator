@@ -100,6 +100,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     InstructorsCap,
     LaurelCoronet,
     MaskOfSolitudeBasalt,
+    OceanHuedClam,
     ShadowOfTheSandKing,
     TenacityOfTheMillelith,
     ThunderSummonersCrown,

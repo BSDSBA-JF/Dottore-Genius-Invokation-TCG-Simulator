@@ -5,7 +5,7 @@ all I need now is to implement each card and character.
 
 - [Implementation Progress](#implementation-progress)
   - [Character (45/95 implemented)](#character-4595-implemented)
-  - [Card (174/334 implemented)](#card-174334-implemented)
+  - [Card (175/334 implemented)](#card-175334-implemented)
 
 ## Character (45/95 implemented)
 
@@ -62,9 +62,9 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [x] Stonehide Lawachurl
 
-## Card (174/334 implemented)
+## Card (175/334 implemented)
 
-- [ ] Equipment Card (91/177):
+- [ ] Equipment Card (92/177):
   - [ ] Talent Card:
     - [x] Abyssal Mayhem Hydrospout
     - [x] Arataki Ichiban
@@ -156,7 +156,7 @@ all I need now is to implement each card and character.
     - [x] Instructor's Cap
     - [x] Laurel Coronet
     - [x] Mask of Solitude Basalt
-    - [ ] Ocean-Hued Clam
+    - [x] Ocean-Hued Clam
     - [ ] Ornate Kabuto
     - [x] Shadow of the Sand King
     - [x] Tenacity of the Millelith

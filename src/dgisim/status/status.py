@@ -116,9 +116,10 @@ __all__ = [
     "InstructorsCapStatus",
     "LaurelCoronetStatus",
     "MaskOfSolitudeBasaltStatus",
+    "OceanHuedClamStatus",
+    "ShadowOfTheSandKingStatus",
     "ThunderSummonersCrownStatus",
     "ThunderingFuryStatus",
-    "ShadowOfTheSandKingStatus",
     "TenacityOfTheMillelithStatus",
     "ViridescentVenererStatus",
     "ViridescentVenerersDiademStatus",
@@ -1992,7 +1993,7 @@ class CrimsonWitchOfFlamesStatus(_ElementalDiscountSupplyStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
-class CrownOfWatatsumiStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
+class _CrownOfWatatsumiStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
     usages: int = 0
     MAX_USAGES: ClassVar[int] = 2
     accumulated_healing: int = 0
@@ -2000,11 +2001,6 @@ class CrownOfWatatsumiStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
         TriggeringSignal.POST_HEALING,
     ))
-
-    @cached_classproperty
-    def CARD(cls) -> type[crd.ArtifactEquipmentCard]:
-        from ..card.card import CrownOfWatatsumi
-        return CrownOfWatatsumi
 
     @override
     def _preprocess(
@@ -2045,6 +2041,14 @@ class CrownOfWatatsumiStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
             )
             return [], replace(self, usages=d_usages, accumulated_healing=new_acc_healing)
         return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class CrownOfWatatsumiStatus(_CrownOfWatatsumiStatus):
+    @cached_classproperty
+    def CARD(cls) -> type[crd.ArtifactEquipmentCard]:
+        from ..card.card import CrownOfWatatsumi
+        return CrownOfWatatsumi
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -2107,8 +2111,9 @@ class EchoesOfAnOfferingStatus(ArtifactEquipmentStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
-class ExilesCircletStatus(ArtifactEquipmentStatus):
-    available: bool = True
+class ExilesCircletStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
+    usages: int = 1
+    MAX_USAGES: ClassVar[int] = 1
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
         TriggeringSignal.POST_SKILL,
         TriggeringSignal.ROUND_END,
@@ -2124,7 +2129,7 @@ class ExilesCircletStatus(ArtifactEquipmentStatus):
             self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
             detail: None | InformableEvent
     ) -> tuple[list[eft.Effect], None | Self]:
-        if signal is TriggeringSignal.POST_SKILL and self.available:
+        if signal is TriggeringSignal.POST_SKILL and self.usages > 0:
             assert isinstance(detail, SkillIEvent)
             if (
                     detail.source == source
@@ -2138,8 +2143,8 @@ class ExilesCircletStatus(ArtifactEquipmentStatus):
                     for char in game_state.get_player(source.pid).characters.get_required_chars(
                         activity_order=True, alive=True, non_active=True,
                     )
-                ], replace(self, available=False)
-        elif signal is TriggeringSignal.ROUND_END and not self.available:
+                ], replace(self, usages=-1) 
+        elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES: 
             return [], type(self)()
         return [], self
 
@@ -2522,6 +2527,14 @@ class TenacityOfTheMillelithStatus(ArtifactEquipmentStatus, _UsageLivingStatus):
         elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
             return [], replace(self, usages=self.MAX_USAGES)
         return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class OceanHuedClamStatus(_CrownOfWatatsumiStatus):
+    @cached_classproperty
+    def CARD(cls) -> type[crd.OceanHuedClam]:
+        from ..card.card import OceanHuedClam
+        return OceanHuedClam
 
 
 @dataclass(frozen=True, kw_only=True)
