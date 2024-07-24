@@ -202,6 +202,7 @@ __all__ = [
     "Xudong",
     "YayoiNanatsuki",
     ## Item ##
+    "MementoLens",
     "NRE",
     "ParametricTransformer",
     "TreasureSeekingSeelie",
@@ -3823,6 +3824,11 @@ class YayoiNanatsuki(CompanionCard):
 # >>>>>>>>>>>>>>>>>>>> Support Cards / Companion Cards >>>>>>>>>>>>>>>>>>>>
 
 # <<<<<<<<<<<<<<<<<<<< Support Cards / Item Cards <<<<<<<<<<<<<<<<<<<<
+
+
+class MementoLens(ItemCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 1})
+    _SUPPORT_STATUS = sp.MementoLensSupport
 
 
 class NRE(ItemCard):

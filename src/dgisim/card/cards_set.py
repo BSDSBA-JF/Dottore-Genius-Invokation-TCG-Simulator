@@ -190,6 +190,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     Xudong,
     YayoiNanatsuki,
     ## Support Card / Item ##
+    MementoLens,
     NRE,
     ParametricTransformer,
     TreasureSeekingSeelie,

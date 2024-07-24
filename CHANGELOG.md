@@ -41,6 +41,8 @@
   - Support Cards:
     - Companion Cards:
       - Jeht
+    - Item Cards:
+      - Memento Lens
     - Location Cards:
       - Dawn Winery
   - Event Cards:

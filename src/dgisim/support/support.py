@@ -60,6 +60,7 @@ __all__ = [
     "YayoiNanatsukiSupport",
 
     ## Item ##
+    "MementoLensSupport",
     "NRESupport",
     "ParametricTransformerSupport",
     "TreasureSeekingSeelieSupport",
@@ -1070,6 +1071,48 @@ class LiyueHarborWharfSupport(Support, stt._UsageStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MementoLensSupport(Support, stt._UsageLivingStatus):
+    usages: int = 1
+    MAX_USAGES: ClassVar[int] = 1
+    COST_REDUCTION: ClassVar[int] = 2
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.CARD1_COST_OMNI and self.usages > 0:
+            from ..card.card import WeaponEquipmentCard, ArtifactEquipmentCard, LocationCard, CompanionCard
+            assert isinstance(item, CardPEvent)
+            if (
+                    item.pid is status_source.pid
+                    and item.dice_cost.can_cost_less_elem()
+                    and issubclass(
+                        item.card_type,
+                        WeaponEquipmentCard | ArtifactEquipmentCard | LocationCard | CompanionCard,
+                    )
+                    and item.card_type in game_state.get_player(status_source.pid).publicly_used_cards
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(self.COST_REDUCTION)),
+                    replace(self, usages=-1)
+                )
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
+            return [], replace(self, usages=self.MAX_USAGES)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
 class SumeruCitySupport(Support, stt._UsageLivingStatus):
     usages: int = 1
     MAX_USAGES: ClassVar[int] = 1
@@ -1081,10 +1124,7 @@ class SumeruCitySupport(Support, stt._UsageLivingStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.SKILL_COST_OMNI:
