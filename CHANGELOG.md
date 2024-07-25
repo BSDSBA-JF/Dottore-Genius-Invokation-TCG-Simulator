@@ -49,6 +49,7 @@
     - Location Cards:
       - Dawn Winery
       - Gandharva Ville
+      - Golden House
   - Event Cards:
     - Other Cards:
       - Sunyata Flower

@@ -71,6 +71,7 @@ __all__ = [
     ## Locations ##
     "DawnWinerySupport",
     "GandharvaVilleSupport",
+    "GoldenHouseSupport",
     "KnightsOfFavoniusLibrarySupport",
     "LiyueHarborWharfSupport",
     "SumeruCitySupport",
@@ -1002,9 +1003,10 @@ class RedFeatherFanSupport(Support, stt._UsageLivingStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
-class SeedDispensarySupport(Support, stt._UsageLivingStatus):
-    usages: int = 1
-    MAX_USAGES: ClassVar[int] = 1
+class SeedDispensarySupport(Support, stt._UsageStatus):
+    usages: int = 2
+    MAX_USAGES: ClassVar[int] = 2
+    available: bool = True
     COST_DEDUCTION: ClassVar[int] = 1
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
         TriggeringSignal.ROUND_END,
@@ -1015,7 +1017,7 @@ class SeedDispensarySupport(Support, stt._UsageLivingStatus):
             self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
-        if signal is Preprocessables.CARD1_COST_OMNI and self.usages > 0:
+        if signal is Preprocessables.CARD1_COST_OMNI and self.usages > 0 and self.available:
             assert isinstance(item, CardPEvent)
             from ..card.card import SupportCard
             if (
@@ -1025,7 +1027,7 @@ class SeedDispensarySupport(Support, stt._UsageLivingStatus):
             ):
                 return (
                     item.with_new_cost(item.dice_cost.cost_less_elem(self.COST_DEDUCTION)),
-                    replace(self, usages=self.usages - 1),
+                    replace(self, usages=self.usages - 1, available=False),
                 )
         return item, self
 
@@ -1034,8 +1036,8 @@ class SeedDispensarySupport(Support, stt._UsageLivingStatus):
             self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
             detail: None | InformableEvent
     ) -> tuple[list[eft.Effect], None | Self]:
-        if signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
-            return [], type(self)(sid=self.sid)
+        if signal is TriggeringSignal.ROUND_END and not self.available:
+            return [], replace(self, usages=0, available=True)
         return [], self
 
 
@@ -1145,6 +1147,45 @@ class GandharvaVilleSupport(Support, stt._UsageStatus):
                     ),
                 ], replace(self, usages=-1, available=False)
         elif signal is TriggeringSignal.ROUND_END and not self.available:
+            return [], replace(self, usages=0, available=True)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class GoldenHouseSupport(Support, stt._UsageStatus):
+    usages: int = 2
+    MAX_USAGES: ClassVar[int] = 2
+    available: bool = True
+    COST_DEDUCTION: ClassVar[int] = 1
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.CARD1_COST_OMNI and self.usages > 0 and self.available:
+            assert isinstance(item, CardPEvent)
+            from ..card.card import WeaponEquipmentCard, ArtifactEquipmentCard
+            if (
+                    issubclass(item.card_type, WeaponEquipmentCard | ArtifactEquipmentCard)
+                    and item.card_type._DICE_COST.num_dice() >= 3
+                    and item.dice_cost.can_cost_less_elem()
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(self.COST_DEDUCTION)),
+                    replace(self, usages=self.usages - 1, available=False),
+                )
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END and not self.available:
             return [], replace(self, usages=0, available=True)
         return [], self
 

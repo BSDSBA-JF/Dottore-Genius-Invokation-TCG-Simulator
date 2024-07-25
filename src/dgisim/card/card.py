@@ -212,6 +212,7 @@ __all__ = [
     ## Location ##
     "DawnWinery",
     "GandharvaVille",
+    "GoldenHouse",
     "KnightsOfFavoniusLibrary",
     "LiyueHarborWharf",
     "SumeruCity",
@@ -3892,6 +3893,11 @@ class DawnWinery(LocationCard):
 class GandharvaVille(LocationCard):
     _DICE_COST = AbstractDice({Element.OMNI: 1})
     _SUPPORT_STATUS = sp.GandharvaVilleSupport
+
+
+class GoldenHouse(LocationCard):
+    _DICE_COST = AbstractDice.from_empty()
+    _SUPPORT_STATUS = sp.GoldenHouseSupport
 
 
 class KnightsOfFavoniusLibrary(LocationCard):

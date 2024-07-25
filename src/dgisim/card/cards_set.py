@@ -200,6 +200,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     ## Support Card / Location ##
     DawnWinery,
     GandharvaVille,
+    GoldenHouse,
     KnightsOfFavoniusLibrary,
     LiyueHarborWharf,
     SumeruCity,

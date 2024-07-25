@@ -8,7 +8,7 @@ SUPPORT_STATUS = SeedDispensarySupport
 def p1_support_status(game_state: GameState, sid: int = 1) -> SUPPORT_STATUS:
     return game_state.player1.supports.just_find(SUPPORT_STATUS, sid)
 
-class TestRedFeatherFan(unittest.TestCase):
+class TestSeedDispensary(unittest.TestCase):
     def test_behaviour(self):
         base_state = ACTION_TEMPLATE
         base_state = replace_hand_cards(base_state, Pid.P1, Cards({
@@ -69,6 +69,8 @@ class TestRedFeatherFan(unittest.TestCase):
             card=SUPPORT,
             instruction=DiceOnlyInstruction(dice=ActualDice.from_empty()),
         ))
+        self.assertEqual(p1_support_status(game_state, 1).usages, 1)
+        self.assertEqual(p1_support_status(game_state, 2).usages, 2)
         game_state = step_action(game_state, Pid.P1, CardAction(
             card=ParametricTransformer,
             instruction=DiceOnlyInstruction(dice=ActualDice.from_empty()),
@@ -77,3 +79,5 @@ class TestRedFeatherFan(unittest.TestCase):
             card=Paimon,
             instruction=DiceOnlyInstruction(dice=ActualDice({Element.OMNI: 3})),
         ))
+        self.assertIsNone(game_state.player1.supports.find(SUPPORT_STATUS, 1))
+        self.assertEqual(p1_support_status(game_state, 2).usages, 1)
