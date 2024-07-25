@@ -64,6 +64,7 @@ __all__ = [
     "MementoLensSupport",
     "NRESupport",
     "ParametricTransformerSupport",
+    "RedFeatherFanSupport",
     "TreasureSeekingSeelieSupport",
 
     ## Locations ##
@@ -883,10 +884,7 @@ class NRESupport(Support, stt._UsageLivingStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         from ..card.card import FoodCard
@@ -978,6 +976,30 @@ class ParametricTransformerSupport(Support, stt._UsageLivingStatus):
 
 
 @dataclass(frozen=True, kw_only=True)
+class RedFeatherFanSupport(Support, stt._UsageLivingStatus):
+    usages: int = 1
+    MAX_USAGES: ClassVar[int] = 1
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.SELF_SWAP,
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.SELF_SWAP and self.usages > 0:
+            return [eft.AddCombatStatusEffect(
+                target_pid=source.pid,
+                status=stt.RedFeatherFanStatus,
+            )], replace(self, usages=-1)
+        elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
+            return [], type(self)(sid=self.sid)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
 class TreasureSeekingSeelieSupport(Support, stt._UsageLivingStatus):
     usages: int = 0
     triggered: bool = False
@@ -989,10 +1011,7 @@ class TreasureSeekingSeelieSupport(Support, stt._UsageLivingStatus):
 
     @override
     def _inform(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            info_type: Informables,
+            self, game_state: GameState, status_source: StaticTarget, info_type: Informables,
             information: InformableEvent,
     ) -> Self:
         if info_type is Informables.POST_SKILL_USAGE:

@@ -194,6 +194,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     MementoLens,
     NRE,
     ParametricTransformer,
+    RedFeatherFan,
     TreasureSeekingSeelie,
     ## Support Card / Location ##
     KnightsOfFavoniusLibrary,

@@ -145,6 +145,7 @@ __all__ = [
     "MillennialMovementFarewellSongStatus",
     "PassingOfJudgmentStatus",
     "RebelliousShieldStatus",
+    "RedFeatherFanStatus",
     "ReviveOnCooldownStatus",
     "SandAndDreamsStatus",
     "StoneAndContractsStatus",
@@ -3093,6 +3094,47 @@ class PassingOfJudgmentStatus(CombatStatus, _UsageStatus):
 class RebelliousShieldStatus(CombatStatus, StackedShieldStatus):
     usages: int = 1
     MAX_USAGES: ClassVar[int] = 2
+
+
+@dataclass(frozen=True, kw_only=True)
+class RedFeatherFanStatus(CombatStatus):
+    used: bool = False
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.SWAP_COST_OMNI:
+            assert isinstance(item, ActionPEvent)
+            if (
+                    item.source.pid is status_source.pid
+                    and item.dice_cost.can_cost_less_elem()
+            ):
+                return item.with_new_cost(item.dice_cost.cost_less_elem(1)), replace(self, used=True)
+        elif signal is Preprocessables.SWAP:
+            assert isinstance(item, ActionPEvent)
+            if (
+                    item.source.pid is status_source.pid
+                    and (
+                        item.is_combat_action()
+                        or self.used
+                    )
+            ):
+                return item.make_fast_action(), None
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END:
+            return [], None
+        return [], self
 
 
 @dataclass(frozen=True, kw_only=True)

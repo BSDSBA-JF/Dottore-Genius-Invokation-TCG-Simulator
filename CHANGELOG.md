@@ -44,6 +44,7 @@
       - Timmie
     - Item Cards:
       - Memento Lens
+      - Red Feather Fan
     - Location Cards:
       - Dawn Winery
   - Event Cards:

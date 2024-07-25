@@ -270,7 +270,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         #### 2.3 Item Card 0450 ####
         (card.ParametricTransformer, 450),
         (card.NRE, 451),
-        # (card.RedFeatherFan, 452),
+        (card.RedFeatherFan, 452),
         (card.TreasureSeekingSeelie, 453),
         (card.MementoLens, 454),
 
@@ -677,6 +677,7 @@ STT_MAPPING: dict[type["Status"], int] = HashableDict({
         (status.TheBoarPrincessStatus, 319),
         (status.SunyataFlowerStatus, 320),
         (status.SandAndDreamsStatus, 321),
+        (status.RedFeatherFanStatus, 322),
 
         #### 2.2 Shield Combat Status 375 ####
         (status.CrystallizeStatus, 375),
@@ -1035,7 +1036,7 @@ SUPP_MAPPING: dict[type["Support"], int] = HashableDict({
         #### Item 200 ####
         (support.ParametricTransformerSupport, 200),
         (support.NRESupport, 201),
-        # (support.RedFeatherFanSupport, 202),
+        (support.RedFeatherFanSupport, 202),
         (support.TreasureSeekingSeelieSupport, 203),
         (support.MementoLensSupport, 204),
 

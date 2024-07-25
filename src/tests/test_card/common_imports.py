@@ -8,7 +8,9 @@ from src.dgisim.element import PURE_ELEMENTS
 from src.dgisim.game_state_machine import GameStateMachine
 from src.dgisim.state.enums import Pid
 from src.dgisim.status.status import *
+from src.dgisim.status.statuses import Statuses
 from src.dgisim.summon.summon import *
 from src.dgisim.support.support import *
+from src.dgisim.support.supports import Supports
 from src.tests.helpers.game_state_templates import *
 from src.tests.helpers.quality_of_life import *

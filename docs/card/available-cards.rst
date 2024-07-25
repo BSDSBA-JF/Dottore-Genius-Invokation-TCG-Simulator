@@ -1,7 +1,7 @@
 Available Cards
 ===============
 
-178 of 334 cards in Genius Invokation TCG are available in the simulator.
+179 of 334 cards in Genius Invokation TCG are available in the simulator.
 (excluding character cards which are not counted as cards in ``dgisim``)
 
 Equipment Cards
@@ -155,6 +155,7 @@ Item Card
 * Memento Lens
 * NRE
 * Parametric Transformer
+* Red Feather Fan
 * Treasure-Seeking Seelie
 
 Location Card

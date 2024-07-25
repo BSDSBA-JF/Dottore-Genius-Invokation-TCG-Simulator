@@ -206,6 +206,7 @@ __all__ = [
     "MementoLens",
     "NRE",
     "ParametricTransformer",
+    "RedFeatherFan",
     "TreasureSeekingSeelie",
     ## Location ##
     "DawnWinery",
@@ -3860,6 +3861,12 @@ class NRE(ItemCard):
 class ParametricTransformer(ItemCard):
     _DICE_COST = AbstractDice({Element.ANY: 2})
     _SUPPORT_STATUS = sp.ParametricTransformerSupport
+
+
+class RedFeatherFan(ItemCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 2})
+    _SUPPORT_STATUS = sp.RedFeatherFanSupport
+
 
 class TreasureSeekingSeelie(ItemCard):
     _DICE_COST = AbstractDice({Element.OMNI: 1})
