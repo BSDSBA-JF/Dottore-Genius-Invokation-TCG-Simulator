@@ -5,7 +5,7 @@ all I need now is to implement each card and character.
 
 - [Implementation Progress](#implementation-progress)
   - [Character (45/95 implemented)](#character-4595-implemented)
-  - [Card (183/334 implemented)](#card-183334-implemented)
+  - [Card (184/334 implemented)](#card-184334-implemented)
 
 ## Character (45/95 implemented)
 
@@ -62,7 +62,7 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [x] Stonehide Lawachurl
 
-## Card (183/334 implemented)
+## Card (184/334 implemented)
 
 - [ ] Equipment Card (93/177):
   - [ ] Talent Card:
@@ -167,7 +167,7 @@ all I need now is to implement each card and character.
     - [x] Vourukasha's Glow
     - [x] Wine-Stained Tricorne
     - [x] Witch's Scorching Hat
-- [ ] Support Card (31/56):
+- [ ] Support Card (32/56):
   - [ ] Companion Card:
     - [x] Chang the Ninth
     - [x] Chef Mao
@@ -199,7 +199,7 @@ all I need now is to implement each card and character.
     - [x] Jade Chamber
     - [x] Knights of Favonius Library
     - [x] Liyue Harbor Wharf
-    - [ ] Opera Epiclese
+    - [x] Opera Epiclese
     - [ ] Stormterror's Lair
     - [x] Sumeru City
     - [x] Tenshukaku

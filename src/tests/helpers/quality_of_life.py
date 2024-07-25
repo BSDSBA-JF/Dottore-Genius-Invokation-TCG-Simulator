@@ -7,7 +7,7 @@ from typing_extensions import Self
 
 from src.dgisim.action.action import *
 from src.dgisim.agents import *
-from src.dgisim.card.card import Card
+from src.dgisim.card.card import *
 from src.dgisim.card.cards import Cards, OrderedCards
 from src.dgisim.character.character import Character
 from src.dgisim.character.characters import Characters
@@ -860,10 +860,10 @@ def p2_chars(game_state: GameState) -> tuple[Character, ...]:
     return game_state.player2.characters.get_characters()
 
 
-def end_round(game_state: GameState, pid: Pid) -> GameState:
+def end_round(game_state: GameState, pid: Pid, observe: bool = False) -> GameState:
     """ End round for `pid` given they have not ended yet. """
     game_state = skip_action_round_until(game_state, pid)
-    game_state = step_action(game_state, pid, EndRoundAction())
+    game_state = step_action(game_state, pid, EndRoundAction(), observe=observe)
     return game_state
 
 
@@ -940,3 +940,99 @@ def keep_only_support(game_state: GameState, pid: Pid, support_type: type[Suppor
     return auto_step(game_state.factory().f_effect_stack(
         lambda es: es.push_many_fl(effects)
     ).build(), observe=observe)
+
+
+def play_support_card(
+        game_state: GameState, pid: Pid, card: type[SupportCard],
+        cost: None | int | ActualDice = None,
+        replaced_sid: None | int = None,
+        observe: bool = False,
+) -> GameState:
+    """ note: use OMNI dice by default """
+    if cost is None:
+        cost = ActualDice({Element.OMNI: card._DICE_COST.num_dice()})
+    elif isinstance(cost, int):
+        cost = ActualDice({Element.OMNI: cost})
+    instruction: DiceOnlyInstruction | StaticTargetInstruction
+    if replaced_sid is None:
+        instruction = DiceOnlyInstruction(dice=cost)
+    else:
+        instruction = StaticTargetInstruction(
+            target=StaticTarget.from_support(pid, replaced_sid),
+            dice=cost,
+        )
+    game_state = just(game_state.action_step(pid, CardAction(
+        card=card,
+        instruction=instruction,
+    )))
+    return auto_step(game_state, observe=observe)
+
+
+def play_char_target_card(
+        game_state: GameState, pid: Pid, card: type[Card],
+        char_id: None | int = None,
+        cost: None | int | ActualDice = None,
+        observe: bool = False,
+) -> GameState:
+    """ note: use OMNI dice by default """
+    if cost is None:
+        cost = ActualDice({Element.OMNI: card._DICE_COST.num_dice()})
+    elif isinstance(cost, int):
+        cost = ActualDice({Element.OMNI: cost})
+    if char_id is None:
+        char_id = game_state.get_player(pid).characters.just_get_active_character_id()
+    game_state = just(game_state.action_step(pid, CardAction(
+        card=card,
+        instruction=StaticTargetInstruction(
+            target=StaticTarget.from_char_id(pid, char_id),
+            dice=cost,
+        ),
+    )))
+    return auto_step(game_state, observe=observe)
+
+
+def play_dice_only_card(
+        game_state: GameState, pid: Pid, card: type[Card],
+        cost: None | int | ActualDice = None,
+        observe: bool = False,
+) -> GameState:
+    """ note: use OMNI dice by default """
+    if cost is None:
+        cost = ActualDice({Element.OMNI: card._DICE_COST.num_dice()})
+    elif isinstance(cost, int):
+        cost = ActualDice({Element.OMNI: cost})
+    game_state = just(game_state.action_step(pid, CardAction(
+        card=card,
+        instruction=DiceOnlyInstruction(dice=cost),
+    )))
+    return auto_step(game_state, observe=observe)
+
+
+@dataclass(frozen=True, kw_only=True)
+class _TempTestForceRollElemStatus(CombatStatus):
+    element: Element
+
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.ROLL_DICE_INIT:
+            assert isinstance(item, DiceRollInitPEvent)
+            if (
+                    item.pid == status_source.pid
+                    and item.can_update()
+            ):
+                return item.update(self.element, 0x7fffffff), None
+        return item, self
+
+
+def force_roll_element(game_state: GameState, pid: Pid, element: Element) -> GameState:
+    """
+    Adds a combat status to the player that forces the player to roll the specified element the next round.
+    """
+    return game_state.factory().f_player(
+        pid,
+        lambda p: p.factory().f_combat_statuses(
+            lambda csts: csts.update_status(_TempTestForceRollElemStatus(element=element))
+        ).build()
+    ).build()

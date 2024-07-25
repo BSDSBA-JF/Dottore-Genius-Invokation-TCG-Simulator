@@ -33,7 +33,8 @@ from ..helper.quality_of_life import BIG_INT, classproperty
 from ..status.enums import Informables, Preprocessables
 
 if TYPE_CHECKING:
-    from ..card.card import Card
+    from ..card.card import Card, EquipmentCard
+    from ..character.characters import Characters
     from ..encoding.encoding_plan import EncodingPlan
     from ..state.game_state import GameState
 
@@ -75,6 +76,7 @@ __all__ = [
     "JadeChamberSupport",
     "KnightsOfFavoniusLibrarySupport",
     "LiyueHarborWharfSupport",
+    "OperaEpicleseSupport",
     "SumeruCitySupport",
     "TenshukakuSupport",
     "VanaranaSupport",
@@ -1313,6 +1315,52 @@ class MementoLensSupport(Support, stt._UsageLivingStatus):
     ) -> tuple[list[eft.Effect], None | Self]:
         if signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
             return [], replace(self, usages=self.MAX_USAGES)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class OperaEpicleseSupport(Support, stt._UsageStatus):
+    usages: int = 3
+    MAX_USAGES: ClassVar[int] = 3
+    available: bool = True
+    DICE_ADDITION: ClassVar[int] = 1
+
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.PRE_ACTION,
+        TriggeringSignal.ROUND_END,
+    ))
+
+    def _cost_of_equipments(self, chars: Characters) -> int:
+        total_cost = 0
+        for status in chain(*[char.character_statuses for char in chars]):
+            if isinstance(status, stt.EquipmentStatus):
+                total_cost += status.CARD._DICE_COST.num_dice()
+        assert isinstance(total_cost, int)
+        return total_cost
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.PRE_ACTION and self.available and self.usages > 0:
+            if (
+                    game_state.active_player_id is source.pid
+                    and (
+                        self._cost_of_equipments(game_state.get_player(source.pid).characters)
+                        >= self._cost_of_equipments(game_state.get_player(source.pid.other).characters)
+                    )
+            ):
+                return [
+                    eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
+                        pid=source.pid,
+                        element=game_state.get_player(source.pid).just_get_active_character().ELEMENT,
+                        num=self.DICE_ADDITION,
+                    )
+                ], replace(self, usages=-1, available=False)
+        elif signal is TriggeringSignal.ROUND_END and not self.available:
+            return [], replace(self, usages=0, available=True)
         return [], self
 
 

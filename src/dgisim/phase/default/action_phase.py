@@ -334,8 +334,14 @@ class ActionPhase(ph.Phase):
             pid,
             TriggeringSignal.POST_ANY,
         ))
-        if not card_event.invalidated and card.is_combat_action():
-            new_effects.append(TurnEndEffect())
+        if not card_event.invalidated:
+            if card.is_combat_action():
+                new_effects.append(TurnEndEffect())
+            else:
+                new_effects.append(AllStatusTriggererEffect(
+                    pid,
+                    TriggeringSignal.PRE_ACTION,
+                ))
         return game_state.factory().f_effect_stack(
             lambda es: es.push_many_fl(new_effects)
         ).player(

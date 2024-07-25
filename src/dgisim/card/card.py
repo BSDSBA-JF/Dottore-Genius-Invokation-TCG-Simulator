@@ -216,6 +216,7 @@ __all__ = [
     "JadeChamber",
     "KnightsOfFavoniusLibrary",
     "LiyueHarborWharf",
+    "OperaEpiclese",
     "SumeruCity",
     "Tenshukaku",
     "Vanarana",
@@ -3929,6 +3930,11 @@ class KnightsOfFavoniusLibrary(LocationCard):
 class LiyueHarborWharf(LocationCard):
     _DICE_COST = AbstractDice({Element.OMNI: 2})
     _SUPPORT_STATUS = sp.LiyueHarborWharfSupport
+
+
+class OperaEpiclese(LocationCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 1})
+    _SUPPORT_STATUS = sp.OperaEpicleseSupport
 
 
 class SumeruCity(LocationCard):

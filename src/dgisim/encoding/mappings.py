@@ -242,6 +242,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         (card.GoldenHouse, 262),
         (card.GandharvaVille, 263),
         # (card.StormterrorsLair, 264),
+        (card.OperaEpiclese, 265),
 
         #### 2.2 Companion Card 0350 ####
         (card.Paimon, 350),
@@ -1009,6 +1010,7 @@ SUPP_MAPPING: dict[type["Support"], int] = HashableDict({
         (support.GoldenHouseSupport, 12),
         (support.GandharvaVilleSupport, 13),
         # (support.StormterrorsLairSupport, 14),
+        (support.OperaEpicleseSupport, 15),
 
         #### Companion 100 ####
         (support.PaimonSupport, 100),

@@ -51,6 +51,7 @@
       - Gandharva Ville
       - Golden House
       - Jade Chamber
+      - Opera Epiclese
   - Event Cards:
     - Other Cards:
       - Sunyata Flower

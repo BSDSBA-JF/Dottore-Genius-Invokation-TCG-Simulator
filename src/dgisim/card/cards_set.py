@@ -204,6 +204,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     JadeChamber,
     KnightsOfFavoniusLibrary,
     LiyueHarborWharf,
+    OperaEpiclese,
     SumeruCity,
     Tenshukaku,
     Vanarana,
