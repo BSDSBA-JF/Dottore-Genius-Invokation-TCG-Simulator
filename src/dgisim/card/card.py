@@ -213,6 +213,7 @@ __all__ = [
     "DawnWinery",
     "GandharvaVille",
     "GoldenHouse",
+    "JadeChamber",
     "KnightsOfFavoniusLibrary",
     "LiyueHarborWharf",
     "SumeruCity",
@@ -3898,6 +3899,11 @@ class GandharvaVille(LocationCard):
 class GoldenHouse(LocationCard):
     _DICE_COST = AbstractDice.from_empty()
     _SUPPORT_STATUS = sp.GoldenHouseSupport
+
+
+class JadeChamber(LocationCard):
+    _DICE_COST = AbstractDice.from_empty()
+    _SUPPORT_STATUS = sp.JadeChamberSupport
 
 
 class KnightsOfFavoniusLibrary(LocationCard):

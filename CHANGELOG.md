@@ -50,6 +50,7 @@
       - Dawn Winery
       - Gandharva Ville
       - Golden House
+      - Jade Chamber
   - Event Cards:
     - Other Cards:
       - Sunyata Flower

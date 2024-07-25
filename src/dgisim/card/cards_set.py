@@ -201,6 +201,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     DawnWinery,
     GandharvaVille,
     GoldenHouse,
+    JadeChamber,
     KnightsOfFavoniusLibrary,
     LiyueHarborWharf,
     SumeruCity,

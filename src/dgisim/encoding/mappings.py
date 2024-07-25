@@ -229,7 +229,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         #### 2.1 Location Card 0250 ####
         (card.LiyueHarborWharf, 250),
         (card.KnightsOfFavoniusLibrary, 251),
-        # (card.JadeChamber, 252),
+        (card.JadeChamber, 252),
         (card.DawnWinery, 253),
         # (card.WangshuInn, 254),
         # (card.FavoniusCathedral, 255),
@@ -996,7 +996,7 @@ SUPP_MAPPING: dict[type["Support"], int] = HashableDict({
         #### Location 000 ####
         (support.LiyueHarborWharfSupport, 0),
         (support.KnightsOfFavoniusLibrarySupport, 1),
-        # (support.JadeChamberSupport, 2),
+        (support.JadeChamberSupport, 2),
         (support.DawnWinerySupport, 3),
         # (support.WangshuInnSupport, 4),
         # (support.FavoniusCathedralSupport, 5),

@@ -72,6 +72,7 @@ __all__ = [
     "DawnWinerySupport",
     "GandharvaVilleSupport",
     "GoldenHouseSupport",
+    "JadeChamberSupport",
     "KnightsOfFavoniusLibrarySupport",
     "LiyueHarborWharfSupport",
     "SumeruCitySupport",
@@ -1187,6 +1188,46 @@ class GoldenHouseSupport(Support, stt._UsageStatus):
     ) -> tuple[list[eft.Effect], None | Self]:
         if signal is TriggeringSignal.ROUND_END and not self.available:
             return [], replace(self, usages=0, available=True)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class JadeChamberSupport(Support):
+    NUM_UPDATED: ClassVar[int] = 2
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_START,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.ROLL_DICE_INIT:
+            assert isinstance(item, DiceRollInitPEvent)
+            if (
+                    item.pid == status_source.pid
+                    and item.can_update()
+            ):
+                active_char = game_state.get_player(status_source.pid).just_get_active_character()
+                return item.update(active_char.ELEMENT, self.NUM_UPDATED), self
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_START:
+            if game_state.get_player(source.pid).hand_cards.num_cards() <= 3:
+                return [
+                    eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
+                        pid=source.pid,
+                        element=Element.OMNI,
+                        num=1,
+                    ),
+                ], None
         return [], self
 
 
