@@ -5,7 +5,7 @@ all I need now is to implement each card and character.
 
 - [Implementation Progress](#implementation-progress)
   - [Character (45/95 implemented)](#character-4595-implemented)
-  - [Card (179/334 implemented)](#card-179334-implemented)
+  - [Card (180/334 implemented)](#card-180334-implemented)
 
 ## Character (45/95 implemented)
 
@@ -62,7 +62,7 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [x] Stonehide Lawachurl
 
-## Card (179/334 implemented)
+## Card (180/334 implemented)
 
 - [ ] Equipment Card (93/177):
   - [ ] Talent Card:
@@ -167,7 +167,7 @@ all I need now is to implement each card and character.
     - [x] Vourukasha's Glow
     - [x] Wine-Stained Tricorne
     - [x] Witch's Scorching Hat
-- [ ] Support Card (27/56):
+- [ ] Support Card (28/56):
   - [ ] Companion Card:
     - [x] Chang the Ninth
     - [x] Chef Mao
@@ -190,7 +190,7 @@ all I need now is to implement each card and character.
     - [x] NRE
     - [x] Parametric Transformer
     - [x] Red Feather Fan
-    - [ ] Seed Dispensary
+    - [x] Seed Dispensary
     - [x] Treasure-Seeking Seelie
   - [ ] Location Card:
     - [x] Dawn Winery

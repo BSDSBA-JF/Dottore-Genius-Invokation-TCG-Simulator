@@ -45,6 +45,7 @@
     - Item Cards:
       - Memento Lens
       - Red Feather Fan
+      - Seed Dispensary
     - Location Cards:
       - Dawn Winery
   - Event Cards:

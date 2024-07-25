@@ -28,6 +28,7 @@ from src.dgisim.state.game_state import GameState
 from src.dgisim.state.player_state import PlayerState
 from src.dgisim.status.enums import *
 from src.dgisim.status.status import *
+from src.dgisim.support.support import *
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -905,3 +906,37 @@ def reactivate_player(game_state: GameState, pid: Pid) -> GameState:
         ).build(),
         pid,
     )
+
+
+def remove_all_support(game_state: GameState, pid: Pid, support_type: type[Support], observe: bool = False) -> GameState:
+    """
+    :returns: game state with all supports of `support_type` removed from the player
+    """
+    supports = game_state.get_player(pid).supports
+    effects: list[Effect] = []
+    for support in supports:
+        if isinstance(support, support_type):
+            effects.append(RemoveSupportEffect(
+                target_pid=pid,
+                sid=support.sid,
+            ))
+    return auto_step(game_state.factory().f_effect_stack(
+        lambda es: es.push_many_fl(effects)
+    ).build(), observe=observe)
+
+
+def keep_only_support(game_state: GameState, pid: Pid, support_type: type[Support], observe: bool = False) -> GameState:
+    """
+    :returns: game state with only supports of `support_type` kept in the player
+    """
+    supports = game_state.get_player(pid).supports
+    effects: list[Effect] = []
+    for support in supports:
+        if not isinstance(support, support_type):
+            effects.append(RemoveSupportEffect(
+                target_pid=pid,
+                sid=support.sid,
+            ))
+    return auto_step(game_state.factory().f_effect_stack(
+        lambda es: es.push_many_fl(effects)
+    ).build(), observe=observe)

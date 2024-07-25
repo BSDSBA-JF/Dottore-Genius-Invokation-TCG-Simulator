@@ -65,6 +65,7 @@ __all__ = [
     "NRESupport",
     "ParametricTransformerSupport",
     "RedFeatherFanSupport",
+    "SeedDispensarySupport",
     "TreasureSeekingSeelieSupport",
 
     ## Locations ##
@@ -995,6 +996,44 @@ class RedFeatherFanSupport(Support, stt._UsageLivingStatus):
                 status=stt.RedFeatherFanStatus,
             )], replace(self, usages=-1)
         elif signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
+            return [], type(self)(sid=self.sid)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class SeedDispensarySupport(Support, stt._UsageLivingStatus):
+    usages: int = 1
+    MAX_USAGES: ClassVar[int] = 1
+    COST_DEDUCTION: ClassVar[int] = 1
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.CARD1_COST_OMNI and self.usages > 0:
+            assert isinstance(item, CardPEvent)
+            from ..card.card import SupportCard
+            if (
+                    issubclass(item.card_type, SupportCard)
+                    and item.card_type._DICE_COST.num_dice() >= 2
+                    and item.dice_cost.can_cost_less_elem()
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(self.COST_DEDUCTION)),
+                    replace(self, usages=self.usages - 1),
+                )
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END and self.usages < self.MAX_USAGES:
             return [], type(self)(sid=self.sid)
         return [], self
 

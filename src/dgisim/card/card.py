@@ -207,6 +207,7 @@ __all__ = [
     "NRE",
     "ParametricTransformer",
     "RedFeatherFan",
+    "SeedDispensary",
     "TreasureSeekingSeelie",
     ## Location ##
     "DawnWinery",
@@ -3866,6 +3867,11 @@ class ParametricTransformer(ItemCard):
 class RedFeatherFan(ItemCard):
     _DICE_COST = AbstractDice({Element.OMNI: 2})
     _SUPPORT_STATUS = sp.RedFeatherFanSupport
+
+
+class SeedDispensary(ItemCard):
+    _DICE_COST = AbstractDice.from_empty()
+    _SUPPORT_STATUS = sp.SeedDispensarySupport
 
 
 class TreasureSeekingSeelie(ItemCard):

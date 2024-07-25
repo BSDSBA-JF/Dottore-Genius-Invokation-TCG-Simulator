@@ -195,6 +195,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     NRE,
     ParametricTransformer,
     RedFeatherFan,
+    SeedDispensary,
     TreasureSeekingSeelie,
     ## Support Card / Location ##
     KnightsOfFavoniusLibrary,
