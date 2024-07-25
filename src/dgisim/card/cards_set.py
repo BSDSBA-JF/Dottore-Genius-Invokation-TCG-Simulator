@@ -198,6 +198,8 @@ _DEFAULT_CARDS: list[type[Card]] = [
     SeedDispensary,
     TreasureSeekingSeelie,
     ## Support Card / Location ##
+    DawnWinery,
+    GandharvaVille,
     KnightsOfFavoniusLibrary,
     LiyueHarborWharf,
     SumeruCity,

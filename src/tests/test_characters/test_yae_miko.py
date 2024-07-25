@@ -102,9 +102,10 @@ class TestYaeMiko(unittest.TestCase):
         self.assertEqual(p1.just_get_active_character().energy, 0)
 
         # burst with Sesshou Sakura
+        game_state = add_dmg_listener(base_game_state, Pid.P1)
         game_state = AddSummonEffect(
             target_pid=Pid.P1, summon=SesshouSakuraSummon
-        ).execute(base_game_state)
+        ).execute(game_state)
         game_state = step_skill(game_state, Pid.P1, CharacterSkill.ELEMENTAL_BURST)
         p1 = game_state.player1
         self.assertIn(TenkoThunderboltsStatus, p1.combat_statuses)
@@ -121,10 +122,12 @@ class TestYaeMiko(unittest.TestCase):
             self.assertNotIn(SesshouSakuraSummon, p1.summons)
 
         with self.subTest(condition="oppo take action"):
-            game_state = step_skill(post_burst_state, Pid.P2, CharacterSkill.SKILL1)
-            p2ac = game_state.player2.just_get_active_character()
-            self.assertEqual(p2ac.hp, 3)
-            self.assertIn(Element.ELECTRO, p2ac.elemental_aura)
+            game_state = AddCombatStatusEffect(Pid.P2, LeaveItToMeStatus).execute(post_burst_state)
+            game_state = step_swap(game_state, Pid.P2, 3)
+            assert game_state.waiting_for() is Pid.P2
+            self.assertIn(TenkoThunderboltsStatus, game_state.player1.combat_statuses)
+            game_state = step_swap(game_state, Pid.P2, 1)
+            assert_last_dmg(self, game_state, Pid.P1, amount=3, elem=Element.ELECTRO)
             p1 = game_state.player1
             self.assertNotIn(TenkoThunderboltsStatus, p1.combat_statuses)
             self.assertNotIn(SesshouSakuraSummon, p1.summons)

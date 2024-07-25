@@ -211,6 +211,7 @@ __all__ = [
     "TreasureSeekingSeelie",
     ## Location ##
     "DawnWinery",
+    "GandharvaVille",
     "KnightsOfFavoniusLibrary",
     "LiyueHarborWharf",
     "SumeruCity",
@@ -3886,6 +3887,11 @@ class TreasureSeekingSeelie(ItemCard):
 class DawnWinery(LocationCard):
     _DICE_COST = AbstractDice({Element.OMNI: 2})
     _SUPPORT_STATUS = sp.DawnWinerySupport
+
+
+class GandharvaVille(LocationCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 1})
+    _SUPPORT_STATUS = sp.GandharvaVilleSupport
 
 
 class KnightsOfFavoniusLibrary(LocationCard):

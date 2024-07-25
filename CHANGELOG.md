@@ -48,6 +48,7 @@
       - Seed Dispensary
     - Location Cards:
       - Dawn Winery
+      - Gandharva Ville
   - Event Cards:
     - Other Cards:
       - Sunyata Flower

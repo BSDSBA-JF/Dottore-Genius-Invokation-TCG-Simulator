@@ -70,6 +70,7 @@ __all__ = [
 
     ## Locations ##
     "DawnWinerySupport",
+    "GandharvaVilleSupport",
     "KnightsOfFavoniusLibrarySupport",
     "LiyueHarborWharfSupport",
     "SumeruCitySupport",
@@ -1113,6 +1114,39 @@ class DawnWinerySupport(Support, stt._UsageLivingStatus):
             return [], replace(self, usages=self.MAX_USAGES)
         return [], self
 
+
+
+@dataclass(frozen=True, kw_only=True)
+class GandharvaVilleSupport(Support, stt._UsageStatus):
+    usages: int = 3
+    MAX_USAGES: ClassVar[int] = 3
+    available: bool = True
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.PRE_ACTION,
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.PRE_ACTION and self.usages > 0 and self.available:
+            if (
+                    game_state.active_player_id is source.pid
+                    and game_state.get_player(source.pid).dice.num_dice() == 0
+            ):
+                return [
+                    eft.AddDiceEffect(
+                        source=source.with_status(type(self)),
+                        pid=source.pid,
+                        element=Element.OMNI,
+                        num=1,
+                    ),
+                ], replace(self, usages=-1, available=False)
+        elif signal is TriggeringSignal.ROUND_END and not self.available:
+            return [], replace(self, usages=0, available=True)
+        return [], self
 
 
 @dataclass(frozen=True, kw_only=True)
