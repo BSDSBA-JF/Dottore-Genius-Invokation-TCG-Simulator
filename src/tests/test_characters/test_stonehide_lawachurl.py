@@ -20,7 +20,7 @@ class TestStonehideLawachurl(unittest.TestCase):
         ).execute(game_state)
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL1,
-            dice=ActualDice({Element.GEO: 1, Element.PYRO: 1, Element.HYDRO: 1}),
+            cost=ActualDice({Element.GEO: 1, Element.PYRO: 1, Element.HYDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -34,7 +34,7 @@ class TestStonehideLawachurl(unittest.TestCase):
         ).execute(game_state)
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL2,
-            dice=ActualDice({Element.GEO: 3}),
+            cost=ActualDice({Element.GEO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 3)
@@ -49,7 +49,7 @@ class TestStonehideLawachurl(unittest.TestCase):
         ).execute(game_state)
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.GEO: 3}),
+            cost=ActualDice({Element.GEO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 5)

@@ -19,7 +19,7 @@ class TestKaedeharaKazuha(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)

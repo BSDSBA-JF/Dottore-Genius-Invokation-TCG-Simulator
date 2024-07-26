@@ -18,7 +18,7 @@ class TestLayla(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.CRYO: 1, Element.PYRO: 1, Element.GEO: 1}),
+            cost=ActualDice({Element.CRYO: 1, Element.PYRO: 1, Element.GEO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -30,7 +30,7 @@ class TestLayla(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.CRYO: 3}),
+            cost=ActualDice({Element.CRYO: 3}),
         )
         dmgs = get_dmg_listener_data(game_state, Pid.P1)
         self.assertEqual(len(dmgs), 0)
@@ -48,7 +48,7 @@ class TestLayla(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.CRYO: 3}),
+            cost=ActualDice({Element.CRYO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 3)

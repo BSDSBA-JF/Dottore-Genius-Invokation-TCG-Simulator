@@ -217,6 +217,7 @@ __all__ = [
     "KnightsOfFavoniusLibrary",
     "LiyueHarborWharf",
     "OperaEpiclese",
+    "StormterrorsLair",
     "SumeruCity",
     "Tenshukaku",
     "Vanarana",
@@ -3913,10 +3914,7 @@ class KnightsOfFavoniusLibrary(LocationCard):
 
     @classmethod
     def _effects(
-            cls,
-            game_state: gs.GameState,
-            pid: Pid,
-            instruction: act.Instruction,
+            cls, game_state: gs.GameState, pid: Pid, instruction: act.Instruction,
     ) -> tuple[eft.Effect, ...]:
         return (
             eft.SetRerollChancesEffect(
@@ -3935,6 +3933,23 @@ class LiyueHarborWharf(LocationCard):
 class OperaEpiclese(LocationCard):
     _DICE_COST = AbstractDice({Element.OMNI: 1})
     _SUPPORT_STATUS = sp.OperaEpicleseSupport
+
+
+class StormterrorsLair(LocationCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 2})
+    _SUPPORT_STATUS = sp.StormterrorsLairSupport
+
+    @classmethod
+    def _effects(
+            cls, game_state: gs.GameState, pid: Pid, instruction: act.Instruction,
+    ) -> tuple[eft.Effect, ...]:
+        return (
+            eft.DrawRandomCardOfTypeEffect(
+                pid=pid,
+                num=1,
+                card_type=TalentCard,
+            ),
+        )
 
 
 class SumeruCity(LocationCard):

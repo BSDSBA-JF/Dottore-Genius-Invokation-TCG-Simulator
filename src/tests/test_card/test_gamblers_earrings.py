@@ -68,7 +68,7 @@ class TestGamblersEarrings(unittest.TestCase):
         num_dice = game_state.player1.dice.num_dice() - 4  # burst cost deduction
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.OMNI: 4}),
+            cost=ActualDice({Element.OMNI: 4}),
         )
         self.assertEqual(game_state.player1.dice.num_dice(), num_dice + 4)
         gamblers = p1_active_char(game_state).character_statuses.just_find(GamblersEarringsStatus)

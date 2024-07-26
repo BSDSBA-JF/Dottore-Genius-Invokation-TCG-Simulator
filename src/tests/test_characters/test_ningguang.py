@@ -19,7 +19,7 @@ class TestNingguang(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.GEO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.GEO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 1)
@@ -32,7 +32,7 @@ class TestNingguang(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.GEO: 3}),
+            cost=ActualDice({Element.GEO: 3}),
         )
         p1 = game_state.player1
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
@@ -51,7 +51,7 @@ class TestNingguang(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.GEO: 3}),
+            cost=ActualDice({Element.GEO: 3}),
         )
         game_state = step_action(game_state, Pid.P2, EndRoundAction())
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
@@ -65,7 +65,7 @@ class TestNingguang(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.GEO: 3}),
+            cost=ActualDice({Element.GEO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 8)

@@ -52,6 +52,7 @@
       - Golden House
       - Jade Chamber
       - Opera Epiclese
+      - Stormterror's Lair
   - Event Cards:
     - Other Cards:
       - Sunyata Flower

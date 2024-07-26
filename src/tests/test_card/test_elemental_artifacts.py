@@ -25,11 +25,11 @@ class TestElementalArtifacts(unittest.TestCase):
 
         self.assertRaises(Exception, lambda: step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL1,
-            dice=ActualDice({Element.GEO: 1, Element.CRYO: 1}),
+            cost=ActualDice({Element.GEO: 1, Element.CRYO: 1}),
         ))
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ELECTRO: 1, Element.CRYO: 1}),
+            cost=ActualDice({Element.ELECTRO: 1, Element.CRYO: 1}),
         )
 
         # 1.1 test discount is once per round and teammate's cannot take effect
@@ -42,7 +42,7 @@ class TestElementalArtifacts(unittest.TestCase):
         ))
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ELECTRO: 1, Element.CRYO: 2}),
+            cost=ActualDice({Element.ELECTRO: 1, Element.CRYO: 2}),
         )
 
         # 2 test electro dice required is reduced when skill is casted
@@ -55,7 +55,7 @@ class TestElementalArtifacts(unittest.TestCase):
         ))
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL2,
-            dice=ActualDice({Element.ELECTRO: 2}),
+            cost=ActualDice({Element.ELECTRO: 2}),
         )
 
         # 2.1 test talent card is also discounted
@@ -90,7 +90,7 @@ class TestElementalArtifacts(unittest.TestCase):
         game_state = end_round(game_state, Pid.P2)
         game_state = step_skill(
             game_state, Pid.P1, CharacterSkill.SKILL2,
-            dice=ActualDice({Element.ELECTRO: 2}),
+            cost=ActualDice({Element.ELECTRO: 2}),
         )
 
     def test_advanced_artifacts(self):

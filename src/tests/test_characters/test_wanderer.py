@@ -18,7 +18,7 @@ class TestWanderer(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 1)
@@ -31,7 +31,7 @@ class TestWanderer(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.ANEMO: 3}),
+            cost=ActualDice({Element.ANEMO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -46,7 +46,7 @@ class TestWanderer(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.ANEMO: 3}),
+            cost=ActualDice({Element.ANEMO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 7)
@@ -66,7 +66,7 @@ class TestWanderer(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 3)
@@ -82,7 +82,7 @@ class TestWanderer(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.ANEMO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 3)
@@ -101,7 +101,7 @@ class TestWanderer(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.ANEMO: 3}),
+            cost=ActualDice({Element.ANEMO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 8)

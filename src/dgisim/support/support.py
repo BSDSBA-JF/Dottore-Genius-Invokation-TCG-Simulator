@@ -77,6 +77,7 @@ __all__ = [
     "KnightsOfFavoniusLibrarySupport",
     "LiyueHarborWharfSupport",
     "OperaEpicleseSupport",
+    "StormterrorsLairSupport",
     "SumeruCitySupport",
     "TenshukakuSupport",
     "VanaranaSupport",
@@ -1360,6 +1361,56 @@ class OperaEpicleseSupport(Support, stt._UsageStatus):
                     )
                 ], replace(self, usages=-1, available=False)
         elif signal is TriggeringSignal.ROUND_END and not self.available:
+            return [], replace(self, usages=0, available=True)
+        return [], self
+
+
+@dataclass(frozen=True, kw_only=True)
+class StormterrorsLairSupport(Support, stt._UsageStatus):
+    usages: int = 3
+    MAX_USAGES: ClassVar[int] = 3
+    available: bool = True
+
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.CARD1_COST_OMNI and self.available:
+            assert isinstance(item, CardPEvent)
+            from ..card.card import TalentCard
+            if (
+                    item.pid is status_source.pid
+                    and issubclass(item.card_type, TalentCard)
+                    and item.dice_cost.can_cost_less_elem()
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(1)),
+                    replace(self, usages=self.usages-1, available=False),
+                )
+        elif signal is Preprocessables.SKILL_COST_OMNI and self.available:
+            assert isinstance(item, ActionPEvent) and item.event_type.is_skill()
+            active_char = game_state.get_player(status_source.pid).just_get_active_character()
+            if (
+                    item.source.pid is status_source.pid
+                    and active_char.skill_cost(item.event_type.to_skill_type()).num_dice() >= 4
+            ):
+                return (
+                    item.with_new_cost(item.dice_cost.cost_less_elem(1)),
+                    replace(self, usages=self.usages-1, available=False),
+                )
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END and not self.available:
             return [], replace(self, usages=0, available=True)
         return [], self
 

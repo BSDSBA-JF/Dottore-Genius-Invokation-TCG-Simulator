@@ -2100,6 +2100,8 @@ class EchoesOfAnOfferingStatus(ArtifactEquipmentStatus):
                 ))
                 new_self = replace(new_self, skill_effect=False)
             if self.normal_attack_effect and detail.skill_true_type.is_normal_attack():
+                if self.skill_effect and not new_self.skill_effect:
+                    effects.append(eft.EffectsGroupEndEffect())
                 effects.append(eft.DrawTopCardEffect(
                     pid=source.pid,
                     num=1,

@@ -18,7 +18,7 @@ class TestKujouSara(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.ELECTRO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.ELECTRO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -30,7 +30,7 @@ class TestKujouSara(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.ELECTRO: 3}),
+            cost=ActualDice({Element.ELECTRO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 1)
@@ -44,7 +44,7 @@ class TestKujouSara(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.ELECTRO: 4}),
+            cost=ActualDice({Element.ELECTRO: 4}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 1)

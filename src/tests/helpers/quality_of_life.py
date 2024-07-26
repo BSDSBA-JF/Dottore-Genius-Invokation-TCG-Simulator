@@ -756,14 +756,16 @@ def step_skill(
         game_state: GameState,
         pid: Pid,
         skill: CharacterSkill,
-        dice: None | ActualDice = None,
+        cost: None | int | ActualDice = None,
         observe: bool = False,
 ) -> GameState:
     active_character = game_state.get_player(pid).just_get_active_character()
-    if dice is None:
+    if cost is None:
         dice_used = ActualDice({Element.OMNI: active_character.skill_cost(skill).num_dice()})
+    elif isinstance(cost, int):
+        dice_used = ActualDice({Element.OMNI: cost})
     else:
-        dice_used = dice
+        dice_used = cost
     player_action = SkillAction(
         skill=skill,
         instruction=DiceOnlyInstruction(dice=dice_used)
@@ -1034,5 +1036,15 @@ def force_roll_element(game_state: GameState, pid: Pid, element: Element) -> Gam
         pid,
         lambda p: p.factory().f_combat_statuses(
             lambda csts: csts.update_status(_TempTestForceRollElemStatus(element=element))
+        ).build()
+    ).build()
+
+
+def add_hand_card(game_state: GameState, pid: Pid, card: type[Card], num: int = 1) -> GameState:
+    """ Adds ``num`` of ``card``(s) to hand cards of player ``pid``. """
+    return game_state.factory().f_player(
+        pid,
+        lambda p: p.factory().f_hand_cards(
+            lambda hcs: hcs + {card: num}
         ).build()
     ).build()

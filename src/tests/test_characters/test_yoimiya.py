@@ -18,7 +18,7 @@ class TestYoimiya(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.PYRO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.PYRO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 8)
@@ -30,7 +30,7 @@ class TestYoimiya(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.PYRO: 1}),
+            cost=ActualDice({Element.PYRO: 1}),
         )
         p1ac = game_state.player1.just_get_active_character()
         p2ac = game_state.player2.just_get_active_character()
@@ -47,7 +47,7 @@ class TestYoimiya(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.PYRO: 3}),
+            cost=ActualDice({Element.PYRO: 3}),
         )
         p1 = game_state.player1
         p2ac = game_state.player2.just_get_active_character()
@@ -66,7 +66,7 @@ class TestYoimiya(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 3}),
+            cost=ActualDice({Element.OMNI: 3}),
         )
         p1ac = game_state.player1.just_get_active_character()
         p2ac = game_state.player2.just_get_active_character()
@@ -85,7 +85,7 @@ class TestYoimiya(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 3}),
+            cost=ActualDice({Element.OMNI: 3}),
         )
         p1ac = game_state.player1.just_get_active_character()
         self.assertNotIn(NiwabiEnshouStatus, p1ac.character_statuses)
@@ -97,7 +97,7 @@ class TestYoimiya(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 3}),
+            cost=ActualDice({Element.OMNI: 3}),
         )
         p1 = game_state.player1
         p2ac = game_state.player2.just_get_active_character()
@@ -154,7 +154,7 @@ class TestYoimiya(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 3}),
+            cost=ActualDice({Element.OMNI: 3}),
         )
         p1ac = game_state.player1.just_get_active_character()
         p2ac = game_state.player2.just_get_active_character()
@@ -170,7 +170,7 @@ class TestYoimiya(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.PYRO: 3}),
+            cost=ActualDice({Element.PYRO: 3}),
         )
         p1ac = game_state.player1.just_get_active_character()
         p2ac = game_state.player2.just_get_active_character()

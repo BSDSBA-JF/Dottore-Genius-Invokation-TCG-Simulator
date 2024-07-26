@@ -18,7 +18,7 @@ class TestQiqi(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.CRYO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.CRYO: 1, Element.HYDRO: 1, Element.DENDRO: 1}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 8)
@@ -30,7 +30,7 @@ class TestQiqi(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.CRYO: 3}),
+            cost=ActualDice({Element.CRYO: 3}),
         )
         p1 = game_state.player1
         p2ac = game_state.player2.just_get_active_character()
@@ -46,7 +46,7 @@ class TestQiqi(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.CRYO: 3}),
+            cost=ActualDice({Element.CRYO: 3}),
         )
         p1 = game_state.player1
         p2ac = game_state.player2.just_get_active_character()

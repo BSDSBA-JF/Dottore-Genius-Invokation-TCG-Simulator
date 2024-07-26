@@ -18,7 +18,7 @@ class TestSangonomiyaKokomi(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.HYDRO: 1, Element.ELECTRO: 1, Element.DENDRO: 1}),
+            cost=ActualDice({Element.HYDRO: 1, Element.ELECTRO: 1, Element.DENDRO: 1}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 9)
@@ -30,7 +30,7 @@ class TestSangonomiyaKokomi(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.HYDRO: 3}),
+            cost=ActualDice({Element.HYDRO: 3}),
         )
         p1 = game_state.player1
         p1ac = p1.just_get_active_character()
@@ -48,7 +48,7 @@ class TestSangonomiyaKokomi(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.HYDRO: 3}),
+            cost=ActualDice({Element.HYDRO: 3}),
         )
         p1ac = game_state.player1.just_get_active_character()
         p2ac = game_state.player2.just_get_active_character()

@@ -89,6 +89,18 @@ class EventType(Enum):
     def is_swap(self) -> bool:
         return self is EventType.SWAP
 
+    def to_skill_type(self) -> CharacterSkill:
+        from .character.enums import CharacterSkill
+        if self is EventType.SKILL1:
+            return CharacterSkill.SKILL1
+        if self is EventType.SKILL2:
+            return CharacterSkill.SKILL2
+        if self is EventType.SKILL3:
+            return CharacterSkill.SKILL3
+        if self is EventType.ELEMENTAL_BURST:
+            return CharacterSkill.ELEMENTAL_BURST
+        raise ValueError(f"Event type {self} is not a skill type.")
+
 
 @dataclass(frozen=True, kw_only=True)
 class InformableEvent:

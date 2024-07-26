@@ -18,7 +18,7 @@ class TestJadeplumeTerrorshroom(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.DENDRO: 1, Element.HYDRO: 1, Element.GEO: 1}),
+            cost=ActualDice({Element.DENDRO: 1, Element.HYDRO: 1, Element.GEO: 1}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 8)
@@ -30,7 +30,7 @@ class TestJadeplumeTerrorshroom(unittest.TestCase):
             self.BASE_GAME,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.DENDRO: 3}),
+            cost=ActualDice({Element.DENDRO: 3}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 7)
@@ -42,7 +42,7 @@ class TestJadeplumeTerrorshroom(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.DENDRO: 3}),
+            cost=ActualDice({Element.DENDRO: 3}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 6)

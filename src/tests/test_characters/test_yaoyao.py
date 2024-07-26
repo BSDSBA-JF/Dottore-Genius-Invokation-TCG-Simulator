@@ -18,7 +18,7 @@ class TestYaoyao(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.DENDRO: 1, Element.HYDRO: 1, Element.CRYO: 1}),
+            cost=ActualDice({Element.DENDRO: 1, Element.HYDRO: 1, Element.CRYO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -30,7 +30,7 @@ class TestYaoyao(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.DENDRO: 3}),
+            cost=ActualDice({Element.DENDRO: 3}),
         )
         dmgs = get_dmg_listener_data(game_state, Pid.P1)
         self.assertEqual(len(dmgs), 0)
@@ -45,7 +45,7 @@ class TestYaoyao(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.DENDRO: 4}),
+            cost=ActualDice({Element.DENDRO: 4}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 1)

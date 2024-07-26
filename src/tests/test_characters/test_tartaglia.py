@@ -24,7 +24,7 @@ class TestTartaglia(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.HYDRO: 3}),
+            cost=ActualDice({Element.HYDRO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)

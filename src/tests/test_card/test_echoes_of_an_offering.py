@@ -25,7 +25,7 @@ class TestEchoesOfAnOffering(unittest.TestCase):
         # check skill can add dice if num dice <= num hand-cards
         game_state = replace_dice(base_state, Pid.P1, ActualDice({Element.OMNI: 6}))
         dice_before = game_state.player1.dice
-        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL2, dice=ActualDice({Element.OMNI: 3}))
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL2, cost=ActualDice({Element.OMNI: 3}))
         self.assertEqual(
             game_state.player1.dice - dice_before,
             ActualDice({Element.OMNI: -3, Element.GEO: 1}),
@@ -35,7 +35,7 @@ class TestEchoesOfAnOffering(unittest.TestCase):
         # check dice addition cannot be triggered twice per round
         game_state = replace_dice(game_state, Pid.P1, ActualDice({Element.OMNI: 6}))
         dice_before = game_state.player1.dice
-        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL2, dice=ActualDice({Element.OMNI: 3}))
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL2, cost=ActualDice({Element.OMNI: 3}))
         self.assertEqual(
             game_state.player1.dice - dice_before,
             ActualDice({Element.OMNI: -3}),
@@ -44,10 +44,10 @@ class TestEchoesOfAnOffering(unittest.TestCase):
 
         # check normal attack can trigger card draw once per round
         game_state = replace_dice(game_state, Pid.P1, ActualDice({Element.OMNI: 6}))
-        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3}))
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1, cost=ActualDice({Element.OMNI: 3}))
         self.assertEqual(game_state.player1.hand_cards, Cards({NRE: 3, Liben: 1}))
 
-        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1, dice=ActualDice({Element.OMNI: 3}))
+        game_state = step_skill(game_state, Pid.P1, CharacterSkill.SKILL1, cost=ActualDice({Element.OMNI: 3}))
         self.assertEqual(game_state.player1.hand_cards, Cards({NRE: 3, Liben: 1}))
 
         # check first skill (normal attack) adds dice then draw card

@@ -112,7 +112,7 @@ class TestNoelle(unittest.TestCase):
             base_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.PYRO: 1, Element.CRYO: 1}),
+            cost=ActualDice({Element.PYRO: 1, Element.CRYO: 1}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 6)
@@ -121,7 +121,7 @@ class TestNoelle(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.GEO: 1, Element.DENDRO: 1, Element.ANEMO: 1}),
+            cost=ActualDice({Element.GEO: 1, Element.DENDRO: 1, Element.ANEMO: 1}),
         )
         p2ac = game_state.player2.just_get_active_character()
         self.assertEqual(p2ac.hp, 2)
@@ -139,13 +139,13 @@ class TestNoelle(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 2}),
+            cost=ActualDice({Element.OMNI: 2}),
         )
         game_state = step_skill(
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 3}),
+            cost=ActualDice({Element.OMNI: 3}),
         )
 
         # disappears eventually after two rounds

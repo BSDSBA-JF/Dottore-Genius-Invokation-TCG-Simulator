@@ -18,7 +18,7 @@ class TestYelan(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.HYDRO: 1, Element.PYRO: 1, Element.CRYO: 1}),
+            cost=ActualDice({Element.HYDRO: 1, Element.PYRO: 1, Element.CRYO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -33,7 +33,7 @@ class TestYelan(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.HYDRO: 3}),
+            cost=ActualDice({Element.HYDRO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 3)
@@ -48,7 +48,7 @@ class TestYelan(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.HYDRO: 3}),
+            cost=ActualDice({Element.HYDRO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 3)

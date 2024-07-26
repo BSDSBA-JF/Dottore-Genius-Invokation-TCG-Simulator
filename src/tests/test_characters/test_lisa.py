@@ -23,7 +23,7 @@ class TestLisa(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.OMNI: 3}),
+            cost=ActualDice({Element.OMNI: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 1)
@@ -63,7 +63,7 @@ class TestLisa(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.ELECTRO: 3}),
+            cost=ActualDice({Element.ELECTRO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -101,7 +101,7 @@ class TestLisa(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.ELEMENTAL_BURST,
-            dice=ActualDice({Element.ELECTRO: 3}),
+            cost=ActualDice({Element.ELECTRO: 3}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)

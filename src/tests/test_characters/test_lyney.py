@@ -18,7 +18,7 @@ class TestLyney(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL1,
-            dice=ActualDice({Element.PYRO: 1, Element.HYDRO: 1, Element.CRYO: 1}),
+            cost=ActualDice({Element.PYRO: 1, Element.HYDRO: 1, Element.CRYO: 1}),
         )
         dmg = get_dmg_listener_data(game_state, Pid.P1)[-1]
         self.assertEqual(dmg.damage, 2)
@@ -34,7 +34,7 @@ class TestLyney(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.PYRO: 3}),
+            cost=ActualDice({Element.PYRO: 3}),
         )
         dmgs = get_dmg_listener_data(game_state, Pid.P1)
         self.assertEqual(len(dmgs), 2)
@@ -56,7 +56,7 @@ class TestLyney(unittest.TestCase):
             game_state,
             Pid.P1,
             CharacterSkill.SKILL2,
-            dice=ActualDice({Element.PYRO: 3}),
+            cost=ActualDice({Element.PYRO: 3}),
         )
         dmgs = get_dmg_listener_data(game_state, Pid.P1)
         self.assertEqual(len(dmgs), 1)

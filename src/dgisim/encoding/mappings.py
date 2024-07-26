@@ -241,7 +241,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         # (card.ChinjuForest, 261),
         (card.GoldenHouse, 262),
         (card.GandharvaVille, 263),
-        # (card.StormterrorsLair, 264),
+        (card.StormterrorsLair, 264),
         (card.OperaEpiclese, 265),
 
         #### 2.2 Companion Card 0350 ####
@@ -994,7 +994,7 @@ SUMM_MAPPING: dict[type["Summon"], int] = HashableDict({
 SUPP_MAPPING: dict[type["Support"], int] = HashableDict({
     supp: 16000 + i
     for supp, i in (
-        #### Location 000 ####
+        #### Location 000 ###
         (support.LiyueHarborWharfSupport, 0),
         (support.KnightsOfFavoniusLibrarySupport, 1),
         (support.JadeChamberSupport, 2),
@@ -1009,7 +1009,7 @@ SUPP_MAPPING: dict[type["Support"], int] = HashableDict({
         # (support.ChinjuForestSupport, 11),
         (support.GoldenHouseSupport, 12),
         (support.GandharvaVilleSupport, 13),
-        # (support.StormterrorsLairSupport, 14),
+        (support.StormterrorsLairSupport, 14),
         (support.OperaEpicleseSupport, 15),
 
         #### Companion 100 ####
