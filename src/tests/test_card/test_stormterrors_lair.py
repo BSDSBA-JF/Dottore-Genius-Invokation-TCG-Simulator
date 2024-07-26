@@ -14,9 +14,7 @@ class TestStormterrorsLair(unittest.TestCase):
         base_state = replace_deck_cards(base_state, Pid.P1, OrderedCards((
             Paimon, ThunderingPenance, Paimon,  # talent at the middle
         )))
-        base_state = replace_hand_cards(base_state, Pid.P1, Cards({
-            SUPPORT: 2,
-        }))
+        base_state = replace_hand_cards(base_state, Pid.P1, Cards({SUPPORT: 2}))
         base_state = replace_hand_cards(base_state, Pid.P2, Cards({
             ThunderingPenance: 2,
         }))

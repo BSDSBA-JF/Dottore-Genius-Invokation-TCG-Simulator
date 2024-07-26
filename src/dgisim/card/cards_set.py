@@ -162,12 +162,14 @@ _DEFAULT_CARDS: list[type[Card]] = [
     ## Event Card / Food ##
     AdeptusTemptation,
     ButterCrab,
+    FishAndChips,
     JueyunGuoba,
     LotusFlowerCrisp,
     MondstadtHashBrown,
     MushroomPizza,
     MintyMeatRolls,
     NorthernSmokedChicken,
+    SashimiPlatter,
     SweetMadame,
     TandooriRoastChicken,
     TeyvatFriedEgg,
@@ -209,6 +211,7 @@ _DEFAULT_CARDS: list[type[Card]] = [
     SumeruCity,
     Tenshukaku,
     Vanarana,
+    WeepingWillowOfTheLake,
 ]
 
 _DEFAULT_CARDS_FSET = None

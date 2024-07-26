@@ -81,6 +81,7 @@ __all__ = [
     "SumeruCitySupport",
     "TenshukakuSupport",
     "VanaranaSupport",
+    "WeepingWillowOfTheLakeSupport",
 ]
 
 
@@ -1599,3 +1600,28 @@ class VanaranaSupport(Support):
         for _ in range(fillings):
             ret_val.append(0)
         return ret_val
+
+
+@dataclass(frozen=True, kw_only=True)
+class WeepingWillowOfTheLakeSupport(Support, stt._UsageStatus):
+    usages: int = 2
+    MAX_USAGES: ClassVar[int] = 2
+
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.END_ROUND_CHECK_OUT,
+    ))
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.END_ROUND_CHECK_OUT:
+            if game_state.get_player(source.pid).hand_cards.num_cards() <= 2:
+                return [
+                    eft.DrawTopCardEffect(
+                        pid=source.pid,
+                        num=2,
+                    ),
+                ], replace(self, usages=-1)
+        return [], self

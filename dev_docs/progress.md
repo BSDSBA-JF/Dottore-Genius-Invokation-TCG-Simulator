@@ -62,7 +62,7 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [x] Stonehide Lawachurl
 
-## Card (185/334 implemented)
+## Card (187/334 implemented)
 
 - [ ] Equipment Card (93/177):
   - [ ] Talent Card:
@@ -167,7 +167,7 @@ all I need now is to implement each card and character.
     - [x] Vourukasha's Glow
     - [x] Wine-Stained Tricorne
     - [x] Witch's Scorching Hat
-- [ ] Support Card (33/56):
+- [ ] Support Card (34/56):
   - [ ] Companion Card:
     - [x] Chang the Ninth
     - [x] Chef Mao
@@ -204,8 +204,8 @@ all I need now is to implement each card and character.
     - [x] Sumeru City
     - [x] Tenshukaku
     - [x] Vanarana
-    - [ ] Weeping Willow of the Lake
-- [ ] Event Card (58/101):
+    - [x] Weeping Willow of the Lake
+- [ ] Event Card (59/101):
   - [ ] Talent Card:
     - [x] Absorbing Prism
     - [x] Kanten Senmyou Blessing
@@ -213,7 +213,7 @@ all I need now is to implement each card and character.
   - [ ] Food Card:
     - [x] Adeptus' Temptation
     - [x] Butter Crab
-    - [ ] Fish and Chips
+    - [x] Fish and Chips
     - [x] Jueyun Guoba
     - [x] Lotus Flower Crisp
     - [x] Minty Meat Rolls

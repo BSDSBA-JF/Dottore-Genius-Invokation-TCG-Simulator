@@ -128,12 +128,14 @@ __all__ = [
     ## Food Card ##
     "AdeptusTemptation",
     "ButterCrab",
+    "FishAndChips",
     "JueyunGuoba",
     "LotusFlowerCrisp",
     "MintyMeatRolls",
     "MondstadtHashBrown",
     "MushroomPizza",
     "NorthernSmokedChicken",
+    "SashimiPlatter",
     "SweetMadame",
     "TandooriRoastChicken",
     "TeyvatFriedEgg",
@@ -221,6 +223,7 @@ __all__ = [
     "SumeruCity",
     "Tenshukaku",
     "Vanarana",
+    "WeepingWillowOfTheLake",
 
     # Character Specific
     ## Albedo ##
@@ -2211,6 +2214,24 @@ class ButterCrab(_RangedFoodCard):
             ),
         )
 
+
+
+class FishAndChips(_RangedFoodCard):
+    _DICE_COST = AbstractDice({Element.ANY: 2})
+
+    @override
+    @classmethod
+    def ranged_food_effects(
+            cls, instruction: act.DiceOnlyInstruction, target: StaticTarget,
+    ) -> tuple[eft.Effect, ...]:
+        return (
+            eft.AddCharacterStatusEffect(
+                target=target,
+                status=stt.FishAndChipsStatus,
+            ),
+        )
+
+
 class JueyunGuoba(FoodCard, _CharTargetChoiceProvider):
     _DICE_COST = AbstractDice({})
 
@@ -2309,6 +2330,21 @@ class NorthernSmokedChicken(FoodCard, _CharTargetChoiceProvider):
         )
 
 
+class SashimiPlatter(FoodCard, _CharTargetChoiceProvider):
+    _DICE_COST = AbstractDice({Element.OMNI: 1})
+
+    @override
+    @classmethod
+    def food_effects(cls, pid: Pid, instruction: act.Instruction) -> tuple[eft.Effect, ...]:
+        assert isinstance(instruction, act.StaticTargetInstruction)
+        return (
+            eft.AddCharacterStatusEffect(
+                instruction.target,
+                stt.SashimiPlatterStatus,
+            ),
+        )
+
+
 class SweetMadame(_DirectHealCard, _CharTargetChoiceProvider):
     _DICE_COST = AbstractDice({})
 
@@ -2324,9 +2360,7 @@ class TandooriRoastChicken(_RangedFoodCard):
     @override
     @classmethod
     def ranged_food_effects(
-            cls,
-            instruction: act.DiceOnlyInstruction,
-            target: StaticTarget,
+            cls, instruction: act.DiceOnlyInstruction, target: StaticTarget,
     ) -> tuple[eft.Effect, ...]:
         return (
             eft.AddCharacterStatusEffect(
@@ -3965,6 +3999,12 @@ class Tenshukaku(LocationCard):
 class Vanarana(LocationCard):
     _DICE_COST = AbstractDice.from_empty()
     _SUPPORT_STATUS = sp.VanaranaSupport
+
+
+class WeepingWillowOfTheLake(LocationCard):
+    _DICE_COST = AbstractDice({Element.OMNI: 1})
+    _SUPPORT_STATUS = sp.WeepingWillowOfTheLakeSupport
+
 
 # >>>>>>>>>>>>>>>>>>>> Support Cards / Location Cards >>>>>>>>>>>>>>>>>>>>
 

@@ -53,7 +53,10 @@
       - Jade Chamber
       - Opera Epiclese
       - Stormterror's Lair
+      - Weeping Willow of the Lake
   - Event Cards:
+    - Food Cards:
+      - Fish and Chips
     - Other Cards:
       - Sunyata Flower
 

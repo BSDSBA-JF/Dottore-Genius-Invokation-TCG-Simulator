@@ -220,7 +220,7 @@ def auto_step(game_state: GameState, observe: bool = False) -> GameState:
     return gsm.get_game_state()
 
 
-def auto_step_until(game_state: GameState, predicate: Callable[[GameState], bool], observe: bool = False) -> GameState:
+def step_until(game_state: GameState, predicate: Callable[[GameState], bool], observe: bool = False) -> GameState:
     """
     Step the game state until the predicate is satisfied.
     Note it is assumed that no smart player input is required before the predicate is satisfied.

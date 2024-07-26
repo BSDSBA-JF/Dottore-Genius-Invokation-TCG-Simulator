@@ -243,6 +243,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         (card.GandharvaVille, 263),
         (card.StormterrorsLair, 264),
         (card.OperaEpiclese, 265),
+        (card.WeepingWillowOfTheLake, 266),
 
         #### 2.2 Companion Card 0350 ####
         (card.Paimon, 350),
@@ -337,7 +338,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         (card.JueyunGuoba, 800),
         (card.NorthernSmokedChicken, 801),
         (card.MintyMeatRolls, 802),
-        # (card.SashimiPlatter, 803),
+        (card.SashimiPlatter, 803),
         (card.SweetMadame, 804),
         (card.MondstadtHashBrown, 805),
         (card.MushroomPizza, 806),
@@ -346,6 +347,7 @@ CARD_MAPPING: dict[type["Card"], int] = HashableDict({
         (card.AdeptusTemptation, 809),
         (card.TandooriRoastChicken, 810),
         (card.ButterCrab, 811),
+        (card.FishAndChips, 812),
 
         #### 3.5 Character Event Card 0900 ####
         (card.LightningStiletto, 900),
@@ -700,6 +702,8 @@ STT_MAPPING: dict[type["Status"], int] = HashableDict({
         (status.AdeptusTemptationStatus, 460),
         (status.ButterCrabStatus, 461),
         (status.HeavyStrikeStatus, 462),
+        (status.FishAndChipsStatus, 463),
+        (status.SashimiPlatterStatus, 464),
 
         #### 3.2 Shield Character Status 525 ####
         (status.LithicGuardStatus, 525),
@@ -1011,6 +1015,7 @@ SUPP_MAPPING: dict[type["Support"], int] = HashableDict({
         (support.GandharvaVilleSupport, 13),
         (support.StormterrorsLairSupport, 14),
         (support.OperaEpicleseSupport, 15),
+        (support.WeepingWillowOfTheLakeSupport, 16),
 
         #### Companion 100 ####
         (support.PaimonSupport, 100),

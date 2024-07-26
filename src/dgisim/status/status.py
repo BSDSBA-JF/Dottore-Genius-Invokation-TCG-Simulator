@@ -158,6 +158,7 @@ __all__ = [
     # Character Status
     "AdeptusTemptationStatus",
     "ButterCrabStatus",
+    "FishAndChipsStatus",
     "FrozenStatus",
     "HeavyStrikeStatus",
     "JueyunGuobaStatus",
@@ -168,6 +169,7 @@ __all__ = [
     "MoonpiercerEffectStatus",
     "MushroomPizzaStatus",
     "NorthernSmokedChickenStatus",
+    "SashimiPlatterStatus",
     "SatiatedStatus",
     "TandooriRoastChickenStatus",
     "UnmovableMountainStatus",
@@ -3477,6 +3479,37 @@ class ButterCrabStatus(CharacterStatus, StackedShieldStatus):
         return [], self  # pragma: no cover
 
 
+@dataclass(frozen=True, kw_only=True)
+class FishAndChipsStatus(CharacterStatus):
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.SKILL_COST_OMNI:
+            assert isinstance(item, ActionPEvent)
+            if (
+                    item.source == status_source
+                    and item.event_type.is_skill()
+                    and item.dice_cost.can_cost_less_elem()
+            ):
+                return item.with_new_cost(item.dice_cost.cost_less_elem(1)), None
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END:
+            return [], None
+        return [], self
+
+
 @dataclass(frozen=True)
 class FrozenStatus(CharacterStatus):
     damage_boost: ClassVar[int] = 2
@@ -3486,10 +3519,7 @@ class FrozenStatus(CharacterStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.DMG_AMOUNT_PLUS:
@@ -3728,6 +3758,36 @@ class NorthernSmokedChickenStatus(CharacterStatus):
         return [], self
 
 
+@dataclass(frozen=True, kw_only=True)
+class SashimiPlatterStatus(CharacterStatus):
+    REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
+        TriggeringSignal.ROUND_END,
+    ))
+
+    @override
+    def _preprocess(
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
+            signal: Preprocessables,
+    ) -> tuple[PreprocessableEvent, None | Self]:
+        if signal is Preprocessables.DMG_AMOUNT_PLUS:
+            assert isinstance(item, DmgPEvent)
+            if (
+                    item.dmg.source == status_source
+                    and item.dmg.damage_type.direct_normal_attack()
+            ):
+                return item.delta_damage(1), self
+        return item, self
+
+    @override
+    def _react_to_signal(
+            self, game_state: GameState, source: StaticTarget, signal: TriggeringSignal,
+            detail: None | InformableEvent
+    ) -> tuple[list[eft.Effect], None | Self]:
+        if signal is TriggeringSignal.ROUND_END:
+            return [], None
+        return [], self  # pragma: no cover
+
+
 @dataclass(frozen=True)
 class SatiatedStatus(CharacterStatus):
     REACTABLE_SIGNALS: ClassVar[frozenset[TriggeringSignal]] = frozenset((
@@ -3753,10 +3813,7 @@ class TandooriRoastChickenStatus(CharacterStatus):
 
     @override
     def _preprocess(
-            self,
-            game_state: GameState,
-            status_source: StaticTarget,
-            item: PreprocessableEvent,
+            self, game_state: GameState, status_source: StaticTarget, item: PreprocessableEvent,
             signal: Preprocessables,
     ) -> tuple[PreprocessableEvent, None | Self]:
         if signal is Preprocessables.DMG_AMOUNT_PLUS:
