@@ -62,7 +62,7 @@ all I need now is to implement each card and character.
   - [x] Noelle
   - [x] Stonehide Lawachurl
 
-## Card (187/334 implemented)
+## Card (188/334 implemented)
 
 - [ ] Equipment Card (93/177):
   - [ ] Talent Card:
@@ -205,7 +205,7 @@ all I need now is to implement each card and character.
     - [x] Tenshukaku
     - [x] Vanarana
     - [x] Weeping Willow of the Lake
-- [ ] Event Card (59/101):
+- [ ] Event Card (60/101):
   - [ ] Talent Card:
     - [x] Absorbing Prism
     - [x] Kanten Senmyou Blessing
@@ -220,7 +220,7 @@ all I need now is to implement each card and character.
     - [x] Mondstadt Hash Brown
     - [x] Mushroom Pizza
     - [x] Nothern Smoked Chicken
-    - [ ] Sashimi Platter
+    - [x] Sashimi Platter
     - [x] Sweet Madame
     - [x] Tandoori Roast Chicken
     - [x] Teyvat Fried Egg

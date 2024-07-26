@@ -57,6 +57,7 @@
   - Event Cards:
     - Food Cards:
       - Fish and Chips
+      - Sashimi Platter
     - Other Cards:
       - Sunyata Flower
 

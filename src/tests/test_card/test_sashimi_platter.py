@@ -42,6 +42,7 @@ class TestSashimiPlatter(unittest.TestCase):
             assert_last_dmg(self, base_state, Pid.P1, last_index=1, amount=2, elem=Element.PIERCING)
             assert_last_dmg(self, base_state, Pid.P1, last_index=0, amount=2, elem=Element.CRYO)
             base_state = remove_aura(base_state, Pid.P2)
+            base_state = step_swap(base_state, Pid.P1, 1)
 
         """ test sashimi platter boosts all normal attack infinitely many times this round """
         game_state = base_state
